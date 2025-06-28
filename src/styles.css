@@ -1,0 +1,12 @@
+@import '@angular/material/prebuilt-themes/purple-green.css';      /* Brown/Green */
+
+/* Global styles */
+html, body { 
+  height: 100%;
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: rgba(255, 255, 255, 0.87); /* High contrast text for dark theme */
+}

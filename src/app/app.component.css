@@ -1,0 +1,9 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make the app component take up at least the full viewport height */
+  }
+  
+  .main-content {
+    flex: 1 1 auto; /* Allows the main content area to grow and push the footer down */
+  }

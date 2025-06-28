@@ -1,0 +1,25 @@
+<mat-card class="course-card">
+    <div class="card-image-container">
+      <img mat-card-image [src]="course.thumbnailImageUrl || 'https://placehold.co/600x400?text=Course'" [alt]="course.title">
+      <span *ngIf="isBestseller" class="bestseller-badge">Bestseller</span>
+    </div>
+  
+    <mat-card-content class="card-content">
+      <h3 class="card-title">{{ course.title }}</h3>
+      <p class="card-instructor">{{ course.instructorName || 'Unknown Instructor' }}</p>
+  
+      <mat-chip-listbox aria-label="Course category">
+        <mat-chip *ngIf="course.categoryName">{{ course.categoryName }}</mat-chip>
+      </mat-chip-listbox>
+    </mat-card-content>
+  
+    <mat-card-actions class="card-actions-wrapper">
+      <p class="card-price">${{ course.price }}</p>
+      <div class="buttons">
+        <button mat-icon-button color="accent" aria-label="Add to wishlist">
+          <mat-icon>favorite_border</mat-icon>
+        </button>
+        <button mat-flat-button color="primary">Add to Cart</button>
+      </div>
+    </mat-card-actions>
+  </mat-card>

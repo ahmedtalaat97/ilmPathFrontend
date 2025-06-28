@@ -1,0 +1,20 @@
+.page-container {
+  /* The background is now global, so we only need padding here. */
+  padding: 32px;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.25rem;
+  font-weight: 300;
+  margin-bottom: 32px;
+  /* The text color will now be inherited correctly from the body tag */
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}

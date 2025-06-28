@@ -1,0 +1,29 @@
+<mat-toolbar color="primary" class="navbar">
+    <a routerLink="/" class="logo">
+      <mat-icon>school</mat-icon>
+      <span>عlmPath</span>
+    </a>
+  
+    <div class="nav-links">
+      <a mat-button routerLink="/courses">Courses</a>
+      
+      <button mat-button [matMenuTriggerFor]="categoriesMenu">Categories</button>
+    </div>
+  
+    <div class="spacer"></div>
+  
+    <div class="user-actions">
+      <button mat-icon-button aria-label="Shopping cart">
+        <mat-icon>shopping_cart</mat-icon>
+      </button>
+      <a mat-button routerLink="/login">Log In</a>
+      <a mat-stroked-button color="accent" routerLink="/signup">Sign Up</a>
+    </div>
+  </mat-toolbar>
+  
+  <mat-menu #categoriesMenu="matMenu">
+    <button mat-menu-item>Development</button>
+    <button mat-menu-item>Business</button>
+    <button mat-menu-item>Design</button>
+    <button mat-menu-item>Marketing</button>
+  </mat-menu>

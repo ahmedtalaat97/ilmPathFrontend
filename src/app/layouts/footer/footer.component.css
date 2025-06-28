@@ -1,0 +1,30 @@
+.footer {
+    background-color: #333;
+    color: #ccc;
+    padding: 24px 0;
+    margin-top: auto; /* Pushes footer to the bottom in a flex container */
+  }
+  
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .footer p {
+    margin: 0;
+  }
+  
+  .footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.2s;
+  }
+  
+  .footer-links a:hover {
+    color: white;
+  }

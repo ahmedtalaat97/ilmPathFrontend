@@ -1,0 +1,118 @@
+/*
+  Final Card Style - Version 3
+  Goal: A clean card that works well with the purple-green Material theme
+  while maintaining readability and visual hierarchy.
+*/
+:host {
+  display: flex;
+}
+
+.course-card {
+  /* --- 1. Core Card Style --- */
+  background-color: rgba(255, 255, 255, 0.05); /* Slightly lighter than theme background */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* --- 2. Image and Badge --- */
+.card-image-container {
+  position: relative;
+}
+
+.course-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  opacity: 0.9; /* Slightly muted to match theme */
+}
+
+.bestseller-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: #69f0ae; /* Material Design green accent */
+  color: rgba(0, 0, 0, 0.87);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* --- 3. Card Content (The main text area) --- */
+mat-card-content {
+  padding: 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  color: rgba(255, 255, 255, 0.87); /* High emphasis text */
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  min-height: 45px;
+  margin: 0 0 4px 0;
+}
+
+.card-instructor {
+  color: rgba(255, 255, 255, 0.6); /* Medium emphasis text */
+  font-size: 0.85rem;
+  margin: 0 0 12px 0;
+}
+
+mat-chip {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 400;
+}
+
+/* --- 4. Card Actions (The bottom bar) --- */
+.card-actions-wrapper {
+  padding: 16px;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-price {
+  color: #69f0ae; /* Using accent color for emphasis */
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+}
+
+/* Make the wishlist icon more visible against dark theme */
+.mat-icon-button {
+  color: rgba(0, 255, 106, 0.9); /* Increased opacity for better visibility */
+}
+
+.mat-icon-button mat-icon {
+  font-size: 24px; /* Slightly larger icon */
+  height: 24px;
+  width: 24px;
+}
+
+.mat-icon-button:hover {
+  color: #69f0ae; /* Same accent color as price on hover */
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle background on hover */
+}

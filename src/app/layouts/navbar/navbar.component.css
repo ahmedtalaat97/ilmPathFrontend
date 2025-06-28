@@ -1,0 +1,38 @@
+.navbar {
+    /* This ensures all items are vertically centered and have space between them */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px; /* Adds some padding on the left and right */
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Adds space between the icon and text */
+    text-decoration: none;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 8px; /* Adds space between the nav links */
+  }
+  
+  .spacer {
+    /* This flexible space element pushes the items to the sides */
+    flex: 1 1 auto;
+  }
+  
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Adds space between the action buttons */
+  }
+  
+  /* This makes the "Sign Up" button's border white, which looks better on a dark background */
+  .mat-stroked-button {
+    border-color: rgba(255, 255, 255, 0.7) !important;
+  }
