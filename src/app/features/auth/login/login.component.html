@@ -1,0 +1,50 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Welcome back to IlmPath</mat-card-title>
+      <mat-card-subtitle>Sign in to continue your learning journey</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="Enter your email">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+            {{ getFieldError('email') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="Enter your password">
+          <mat-icon matSuffix>lock</mat-icon>
+          <mat-error *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+            {{ getFieldError('password') }}
+          </mat-error>
+        </mat-form-field>
+
+        <div class="error-message" *ngIf="errorMessage">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <button mat-flat-button color="primary" type="submit" 
+                [disabled]="loginForm.invalid || isLoading" class="full-width login-button">
+          <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading">Signing In...</span>
+        </button>
+      </form>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <div class="register-link">
+        <p>Don't have an account? 
+          <a routerLink="/register" mat-button color="accent">Create Account</a>
+        </p>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div> 
