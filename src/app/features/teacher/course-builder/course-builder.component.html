@@ -1,0 +1,157 @@
+<div class="course-builder">
+  <div class="builder-header">
+    <div class="header-info">
+      <h1>{{ isEditMode ? 'Edit Course' : 'Create New Course' }}</h1>
+      <p>{{ isEditMode ? 'Update your course details and content' : 'Fill in the basic information to get started' }}</p>
+    </div>
+    
+    <div class="header-actions">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button (click)="previewCourse()" *ngIf="isEditMode">Preview</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="courseForm.invalid">
+        {{ isEditMode ? 'Update Course' : 'Create Course' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="builder-content">
+    <mat-tab-group [(selectedIndex)]="activeTab" (selectedTabChange)="onTabChange($event.index)">
+      
+      <!-- Basic Information Tab -->
+      <mat-tab label="Basic Info">
+        <div class="tab-content">
+          <form [formGroup]="courseForm" class="course-form">
+            
+            <!-- Course Title -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Course Title</mat-label>
+              <input matInput formControlName="title" placeholder="Enter course title">
+              <mat-error *ngIf="courseForm.get('title')?.hasError('required')">
+                Course title is required
+              </mat-error>
+              <mat-error *ngIf="courseForm.get('title')?.hasError('maxlength')">
+                Title cannot exceed 200 characters
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Course Description -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Course Description</mat-label>
+              <textarea matInput formControlName="description" rows="6" 
+                        placeholder="Describe what students will learn in this course"></textarea>
+              <mat-error *ngIf="courseForm.get('description')?.hasError('required')">
+                Course description is required
+              </mat-error>
+            </mat-form-field>
+
+            <div class="form-row">
+              <!-- Course Price -->
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Price ($)</mat-label>
+                <input matInput type="number" formControlName="price" min="0" step="0.01">
+                <mat-error *ngIf="courseForm.get('price')?.hasError('required')">
+                  Price is required
+                </mat-error>
+                <mat-error *ngIf="courseForm.get('price')?.hasError('min')">
+                  Price cannot be negative
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Course Category -->
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="categoryId">
+                  <mat-option *ngFor="let category of categories" [value]="category.id">
+                    {{ category.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="courseForm.get('categoryId')?.hasError('required')">
+                  Please select a category
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Thumbnail Upload -->
+            <div class="thumbnail-section">
+              <h3>Course Thumbnail</h3>
+              <div class="thumbnail-upload">
+                <div class="thumbnail-preview">
+                  <img [src]="courseForm.get('thumbnailImageUrl')?.value || 'https://placehold.co/300x200?text=Upload+Thumbnail'" 
+                       alt="Course thumbnail">
+                </div>
+                <div class="upload-controls">
+                  <input #fileInput type="file" accept="image/*" (change)="onThumbnailSelected($event)" hidden>
+                  <button mat-raised-button (click)="fileInput.click()" type="button">
+                    <mat-icon>cloud_upload</mat-icon>
+                    Upload Thumbnail
+                  </button>
+                  <p class="upload-hint">Recommended size: 750x422 pixels (16:9 ratio)</p>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Curriculum Tab -->
+      <mat-tab label="Curriculum">
+        <div class="tab-content">
+          <div class="curriculum-builder">
+            <div class="curriculum-header">
+              <h2>Course Curriculum</h2>
+              <button mat-raised-button color="primary">
+                <mat-icon>add</mat-icon>
+                Add Section
+              </button>
+            </div>
+            
+            <div class="curriculum-content">
+              <div class="empty-curriculum" *ngIf="true">
+                <mat-icon>video_library</mat-icon>
+                <h3>Start building your curriculum</h3>
+                <p>Add sections and lectures to organize your course content</p>
+                <button mat-raised-button color="primary">
+                  <mat-icon>add</mat-icon>
+                  Add Your First Section
+                </button>
+              </div>
+              
+              <!-- TODO: Add sections and lectures list here -->
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Settings Tab -->
+      <mat-tab label="Settings">
+        <div class="tab-content">
+          <div class="settings-form">
+            <h2>Course Settings</h2>
+            
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>Publishing</mat-card-title>
+                <mat-card-subtitle>Control when your course goes live</mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <mat-slide-toggle formControlName="isPublished">
+                  {{ courseForm.get('isPublished')?.value ? 'Published' : 'Draft' }}
+                </mat-slide-toggle>
+                <p class="setting-description">
+                  {{ courseForm.get('isPublished')?.value 
+                     ? 'Your course is live and visible to students'
+                     : 'Your course is in draft mode and not visible to students' }}
+                </p>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Additional settings can be added here -->
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div> 

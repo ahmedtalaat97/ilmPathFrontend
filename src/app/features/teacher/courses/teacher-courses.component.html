@@ -1,0 +1,114 @@
+<div class="teacher-courses">
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-number">{{ totalCourses }}</div>
+        <div class="stat-label">Total Courses</div>
+      </div>
+      <mat-icon class="stat-icon">library_books</mat-icon>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-number">{{ publishedCourses }}</div>
+        <div class="stat-label">Published</div>
+      </div>
+      <mat-icon class="stat-icon">publish</mat-icon>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-number">{{ draftCourses }}</div>
+        <div class="stat-label">Drafts</div>
+      </div>
+      <mat-icon class="stat-icon">draft</mat-icon>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <div class="stat-number">{{ totalEnrollments }}</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <mat-icon class="stat-icon">people</mat-icon>
+    </mat-card>
+  </div>
+
+  <!-- Course Management Section -->
+  <div class="courses-section">
+    <div class="section-header">
+      <h2>My Courses</h2>
+      <button mat-raised-button color="primary" (click)="createCourse()">
+        <mat-icon>add</mat-icon>
+        Create Course
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading your courses...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && courses.length === 0" class="empty-state">
+      <mat-icon>school</mat-icon>
+      <h3>No courses yet</h3>
+      <p>Create your first course to get started teaching!</p>
+      <button mat-raised-button color="primary" (click)="createCourse()">
+        Create Your First Course
+      </button>
+    </div>
+
+    <!-- Courses Grid -->
+    <div *ngIf="!loading && courses.length > 0" class="courses-grid">
+      <mat-card *ngFor="let course of courses" class="course-card">
+        <div class="course-image">
+          <img [src]="course.thumbnailImageUrl || 'https://placehold.co/300x200?text=Course'" [alt]="course.title">
+          <div class="course-status" [class.published]="course.isPublished" [class.draft]="!course.isPublished">
+            {{ course.isPublished ? 'Published' : 'Draft' }}
+          </div>
+        </div>
+
+        <mat-card-content class="course-content">
+          <h3 class="course-title">{{ course.title }}</h3>
+          <p class="course-description">{{ course.description | slice:0:100 }}{{ course.description.length > 100 ? '...' : '' }}</p>
+          
+          <div class="course-meta">
+            <div class="course-category" *ngIf="course.categoryName">
+              <mat-chip>{{ course.categoryName }}</mat-chip>
+            </div>
+            <div class="course-price">${{ course.price }}</div>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions class="course-actions">
+          <button mat-button (click)="editCourse(course.id)">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          
+          <button mat-button [matMenuTriggerFor]="courseMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          
+          <mat-menu #courseMenu="matMenu">
+            <button mat-menu-item (click)="togglePublish(course)">
+              <mat-icon>{{ course.isPublished ? 'unpublished' : 'publish' }}</mat-icon>
+              {{ course.isPublished ? 'Unpublish' : 'Publish' }}
+            </button>
+            <button mat-menu-item (click)="duplicateCourse(course)">
+              <mat-icon>content_copy</mat-icon>
+              Duplicate
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="deleteCourse(course.id)" class="danger-item">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          </mat-menu>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div> 

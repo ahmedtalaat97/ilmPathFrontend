@@ -7,6 +7,12 @@
     <div class="nav-links">
       <a mat-button routerLink="/courses">Courses</a>
       
+      <!-- Teacher Dashboard Link - Show for teachers -->
+      <a mat-button routerLink="/teacher" *ngIf="isLoggedIn">
+        <mat-icon>dashboard</mat-icon>
+        Teach
+      </a>
+      
       <button mat-button [matMenuTriggerFor]="categoriesMenu">Categories</button>
     </div>
   
@@ -54,6 +60,10 @@
     <button mat-menu-item>
       <mat-icon>bookmark</mat-icon>
       <span>My Courses</span>
+    </button>
+    <button mat-menu-item routerLink="/teacher">
+      <mat-icon>school</mat-icon>
+      <span>Teacher Dashboard</span>
     </button>
     <button mat-menu-item>
       <mat-icon>favorite</mat-icon>
