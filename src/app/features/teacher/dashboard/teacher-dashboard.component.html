@@ -1,0 +1,49 @@
+<div class="teacher-dashboard">
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2>
+        <mat-icon>school</mat-icon>
+        Teacher Dashboard
+      </h2>
+    </div>
+    
+    <div class="sidebar-menu">
+      <button mat-button class="menu-item" (click)="navigateTo('courses')" routerLinkActive="active">
+        <mat-icon>library_books</mat-icon>
+        My Courses
+      </button>
+      
+      <button mat-button class="menu-item" (click)="navigateTo('analytics')" routerLinkActive="active">
+        <mat-icon>analytics</mat-icon>
+        Analytics
+      </button>
+      
+      <button mat-button class="menu-item" (click)="navigateTo('students')" routerLinkActive="active">
+        <mat-icon>people</mat-icon>
+        Students
+      </button>
+      
+      <button mat-button class="menu-item" (click)="navigateTo('settings')" routerLinkActive="active">
+        <mat-icon>settings</mat-icon>
+        Settings
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <header class="content-header">
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="navigateTo('courses/new')">
+          <mat-icon>add</mat-icon>
+          Create New Course
+        </button>
+      </div>
+    </header>
+    
+    <div class="content-body">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div> 
