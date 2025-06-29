@@ -16,6 +16,7 @@
   color: white;
   display: flex;
   align-items: center;
+  text-align: center;
   justify-content: space-between;
   padding: 24px;
   border-radius: 16px !important;
@@ -35,6 +36,7 @@
   font-size: 1rem;
   opacity: 0.9;
   font-weight: 500;
+  
 }
 
 .stat-icon {

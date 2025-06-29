@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -14,12 +15,12 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class TeacherDashboardComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
   }
 
-  navigateTo(route: string): void {
-    this.router.navigate(['/teacher', route]);
+  navigateTo(route: string) {
+    this.router.navigate([route], { relativeTo: this.activatedRoute });
   }
 } 
