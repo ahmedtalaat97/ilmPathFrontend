@@ -1,0 +1,358 @@
+<div class="course-builder">
+  <div class="builder-header">
+    <div class="header-info">
+      <h1>{{ isEditMode ? 'Edit Course' : 'Create New Course' }}</h1>
+      <p>{{ isEditMode ? 'Update your course details and content' : 'Fill in the basic information to get started' }}</p>
+    </div>
+    
+    <div class="header-actions">
+      <button mat-button (click)="onCancel()" [disabled]="isLoading">Cancel</button>
+      @if (isEditMode) {
+        <button mat-button (click)="previewCourse()" [disabled]="isLoading">Preview</button>
+      }
+      <button mat-raised-button color="primary" (click)="onSubmit()" 
+              [disabled]="courseForm.invalid || isLoading">
+        @if (isLoading) {
+          <mat-spinner diameter="20" style="margin-right: 8px;"></mat-spinner>
+        }
+        {{ isEditMode ? 'Update Course' : 'Create Course' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="builder-content">
+    <mat-tab-group [(selectedIndex)]="activeTab" (selectedTabChange)="onTabChange($event.index)">
+      
+      <!-- Basic Information Tab -->
+      <mat-tab label="Basic Info">
+        <div class="tab-content">
+          <form [formGroup]="courseForm" class="course-form">
+            
+            <!-- Course Title -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Course Title</mat-label>
+              <input matInput formControlName="title" placeholder="Enter course title">
+              @if (courseForm.get('title')?.hasError('required')) {
+                <mat-error>Course title is required</mat-error>
+              }
+              @if (courseForm.get('title')?.hasError('maxlength')) {
+                <mat-error>Title cannot exceed 200 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Course Description -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Course Description</mat-label>
+              <textarea matInput formControlName="description" rows="6" 
+                        placeholder="Describe what students will learn in this course"></textarea>
+              @if (courseForm.get('description')?.hasError('required')) {
+                <mat-error>Course description is required</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="form-row">
+              <!-- Course Price -->
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Price ($)</mat-label>
+                <input matInput type="number" formControlName="price" min="0" step="0.01">
+                @if (courseForm.get('price')?.hasError('required')) {
+                  <mat-error>Price is required</mat-error>
+                }
+                @if (courseForm.get('price')?.hasError('min')) {
+                  <mat-error>Price cannot be negative</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Course Category -->
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="categoryId">
+                  @for (category of categories; track category.id) {
+                    <mat-option [value]="category.id">
+                      {{ category.name }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (courseForm.get('categoryId')?.hasError('required')) {
+                  <mat-error>Please select a category</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <!-- Thumbnail Upload -->
+            <div class="thumbnail-section">
+              <h3>Course Thumbnail</h3>
+              <div class="thumbnail-upload">
+                <div class="thumbnail-preview">
+                  <img [src]="courseForm.get('thumbnailImageUrl')?.value || 'https://placehold.co/300x200?text=Upload+Thumbnail'" 
+                       alt="Course thumbnail">
+                </div>
+                <div class="upload-controls">
+                  <input #fileInput type="file" accept="image/*" (change)="onThumbnailSelected($event)" hidden>
+                  <button mat-raised-button (click)="fileInput.click()" type="button">
+                    <mat-icon>cloud_upload</mat-icon>
+                    Upload Thumbnail
+                  </button>
+                  <p class="upload-hint">Recommended size: 750x422 pixels (16:9 ratio)</p>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Curriculum Tab -->
+      <mat-tab label="Curriculum">
+        <div class="tab-content">
+          <div class="curriculum-builder">
+            <!-- Loading State -->
+            @if (isLoading) {
+              <div class="loading-container">
+                <mat-spinner diameter="40"></mat-spinner>
+                <p>Loading course curriculum...</p>
+              </div>
+            } @else {
+              <!-- Curriculum Header -->
+              <div class="curriculum-header">
+                <div class="curriculum-stats">
+                  <div class="stat-item">
+                    <span class="stat-number">{{ curriculumArray.length }}</span>
+                    <span class="stat-label">Sections</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">{{ getTotalLessons() }}</span>
+                    <span class="stat-label">Lessons</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">{{ getTotalDuration() }}</span>
+                    <span class="stat-label">Minutes</span>
+                  </div>
+                </div>
+                <button mat-raised-button color="primary" (click)="addSection()">
+                  <mat-icon>add</mat-icon>
+                  Add Section
+                </button>
+              </div>
+
+              <!-- Empty State -->
+              @if (curriculumArray.length === 0) {
+                <div class="empty-curriculum">
+                  <mat-icon>school</mat-icon>
+                  <h3>Start Building Your Curriculum</h3>
+                  <p>Add sections and lessons to create engaging course content for your students.</p>
+                  <button mat-raised-button color="primary" (click)="addSection()">
+                    <mat-icon>add</mat-icon>
+                    Add Your First Section
+                  </button>
+                </div>
+              } @else {
+                <!-- Sections List -->
+                <div class="sections-list" cdkDropList (cdkDropListDropped)="dropSection($event)">
+                  @for (section of curriculumArray.controls; track sectionIndex; let sectionIndex = $index) {
+                    <div cdkDrag class="section-item">
+                      <mat-expansion-panel class="section-panel" [expanded]="sectionIndex === 0">
+                        <mat-expansion-panel-header>
+                          <mat-panel-title>
+                            <div class="section-header">
+                              <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+                              <span class="section-number">{{ sectionIndex + 1 }}.</span>
+                              <span class="section-title">{{ getSectionFormGroup(sectionIndex).get('title')?.value }}</span>
+                              <span class="section-stats">
+                                {{ getLessonsArray(sectionIndex).length }} lessons
+                              </span>
+                            </div>
+                          </mat-panel-title>
+                          <mat-panel-description>
+                            <button mat-icon-button [matMenuTriggerFor]="sectionMenu" (click)="$event.stopPropagation()">
+                              <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #sectionMenu="matMenu">
+                              <button mat-menu-item (click)="duplicateSection(sectionIndex)">
+                                <mat-icon>content_copy</mat-icon>
+                                Duplicate Section
+                              </button>
+                              <button mat-menu-item (click)="removeSection(sectionIndex)" [disabled]="curriculumArray.length === 1">
+                                <mat-icon>delete</mat-icon>
+                                Delete Section
+                              </button>
+                            </mat-menu>
+                          </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <!-- Section Content -->
+                        <div class="section-content" [formGroup]="getSectionFormGroup(sectionIndex)">
+                          <!-- Section Details -->
+                          <div class="section-details">
+                            <mat-form-field appearance="outline" class="full-width">
+                              <mat-label>Section Title</mat-label>
+                              <input matInput formControlName="title" placeholder="Enter section title">
+                              @if (getSectionFormGroup(sectionIndex).get('title')?.hasError('required')) {
+                                <mat-error>Section title is required</mat-error>
+                              }
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" class="full-width">
+                              <mat-label>Section Description (Optional)</mat-label>
+                              <textarea matInput formControlName="description" rows="2" 
+                                        placeholder="Describe what students will learn in this section"></textarea>
+                            </mat-form-field>
+                          </div>
+
+                          <!-- Lessons -->
+                          <div class="lessons-container">
+                            <div class="lessons-header">
+                              <h4>Lessons</h4>
+                              <button mat-button [matMenuTriggerFor]="addLessonMenu">
+                                <mat-icon>add</mat-icon>
+                                Add Lesson
+                              </button>
+                              <mat-menu #addLessonMenu="matMenu">
+                                @for (lessonType of lessonTypes; track lessonType.value) {
+                                  <button mat-menu-item (click)="addLesson(sectionIndex, lessonType.value)">
+                                    <mat-icon>{{ lessonType.icon }}</mat-icon>
+                                    {{ lessonType.label }}
+                                  </button>
+                                }
+                              </mat-menu>
+                            </div>
+
+                            @if (getLessonsArray(sectionIndex).length === 0) {
+                              <div class="empty-lessons">
+                                <mat-icon>playlist_add</mat-icon>
+                                <p>No lessons yet. Add your first lesson above.</p>
+                              </div>
+                            } @else {
+                              <!-- Lessons List with Drag & Drop -->
+                              <div cdkDropList (cdkDropListDropped)="onLessonDrop($event, sectionIndex)" class="lessons-list">
+                                @for (lesson of getLessonsArray(sectionIndex).controls; track lesson.get('id')?.value; let lessonIndex = $index) {
+                                  <div cdkDrag class="lesson-item" [formGroup]="getLessonFormGroup(sectionIndex, lessonIndex)">
+                                    <div class="lesson-header">
+                                      <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+                                      
+                                      <div class="lesson-type-icon">
+                                        @switch (getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value) {
+                                          @case ('video') {
+                                            <mat-icon>play_circle</mat-icon>
+                                          }
+                                          @case ('text') {
+                                            <mat-icon>article</mat-icon>
+                                          }
+                                          @case ('quiz') {
+                                            <mat-icon>quiz</mat-icon>
+                                          }
+                                          @case ('assignment') {
+                                            <mat-icon>assignment</mat-icon>
+                                          }
+                                        }
+                                      </div>
+
+                                      <div class="lesson-info">
+                                        <mat-form-field appearance="outline" class="lesson-title-field">
+                                          <input matInput formControlName="title" placeholder="Lesson title">
+                                          @if (getLessonFormGroup(sectionIndex, lessonIndex).get('title')?.hasError('required')) {
+                                            <mat-error>Lesson title is required</mat-error>
+                                          }
+                                        </mat-form-field>
+
+                                        <div class="lesson-details">
+                                          <mat-form-field appearance="outline" class="lesson-type-field">
+                                            <mat-label>Type</mat-label>
+                                            <mat-select formControlName="type">
+                                              @for (lessonType of lessonTypes; track lessonType.value) {
+                                                <mat-option [value]="lessonType.value">
+                                                  <mat-icon>{{ lessonType.icon }}</mat-icon>
+                                                  {{ lessonType.label }}
+                                                </mat-option>
+                                              }
+                                            </mat-select>
+                                          </mat-form-field>
+
+                                          <mat-form-field appearance="outline" class="lesson-duration-field">
+                                            <mat-label>Duration (minutes)</mat-label>
+                                            <input matInput type="number" formControlName="duration" min="0" placeholder="0">
+                                          </mat-form-field>
+                                        </div>
+
+                                        <!-- Conditional fields based on lesson type -->
+                                        @if (getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value === 'video') {
+                                          <mat-form-field appearance="outline" class="full-width">
+                                            <mat-label>Video URL</mat-label>
+                                            <input matInput formControlName="videoUrl" placeholder="https://...">
+                                          </mat-form-field>
+                                        }
+
+                                        @if (getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value === 'text' || 
+                                             getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value === 'assignment') {
+                                          <mat-form-field appearance="outline" class="full-width">
+                                            <mat-label>Content</mat-label>
+                                            <textarea matInput formControlName="content" rows="3" 
+                                                      placeholder="Enter lesson content..."></textarea>
+                                          </mat-form-field>
+                                        }
+                                      </div>
+
+                                      <div class="lesson-actions">
+                                        <button mat-icon-button [matMenuTriggerFor]="lessonMenu">
+                                          <mat-icon>more_vert</mat-icon>
+                                        </button>
+                                        <mat-menu #lessonMenu="matMenu">
+                                          <button mat-menu-item (click)="duplicateLesson(sectionIndex, lessonIndex)">
+                                            <mat-icon>content_copy</mat-icon>
+                                            Duplicate Lesson
+                                          </button>
+                                          <button mat-menu-item (click)="removeLesson(sectionIndex, lessonIndex)">
+                                            <mat-icon>delete</mat-icon>
+                                            Delete Lesson
+                                          </button>
+                                        </mat-menu>
+                                      </div>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </mat-expansion-panel>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Settings Tab -->
+      <mat-tab label="Settings">
+        <div class="tab-content">
+          <form [formGroup]="courseForm" class="settings-form">
+            <h2>Course Settings</h2>
+            
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>Publishing</mat-card-title>
+                <mat-card-subtitle>Control when your course goes live</mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <mat-slide-toggle formControlName="isPublished">
+                  {{ courseForm.get('isPublished')?.value ? 'Published' : 'Draft' }}
+                </mat-slide-toggle>
+                <p class="setting-description">
+                  {{ courseForm.get('isPublished')?.value 
+                     ? 'Your course is live and visible to students'
+                     : 'Your course is in draft mode and not visible to students' }}
+                </p>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Additional settings can be added here -->
+          </form>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div> 

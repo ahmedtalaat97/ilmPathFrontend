@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { CourseService } from '../course.service';
 import { Course } from '../../../shared/models/course.model';
+import { CourseCardComponent } from '../../../shared/components/course-card/course-card.component';
 
 @Component({
   selector: 'app-course-list',
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    CourseCardComponent
+  ],
   templateUrl: './course-list.component.html',
   styleUrl: './course-list.component.css'
 })

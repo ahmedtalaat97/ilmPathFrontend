@@ -29,10 +29,70 @@
   .user-actions {
     display: flex;
     align-items: center;
-    gap: 8px; /* Adds space between the action buttons */
+    gap: 12px; /* Adds space between the action buttons */
+  }
+
+  .user-name {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 8px;
+  }
+
+  .user-menu-button {
+    margin-right: 4px;
+  }
+  
+  /* User menu styles */
+  .user-info {
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    min-width: 200px;
+  }
+
+  .user-name-menu {
+    font-weight: 500;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .user-email {
+    font-size: 14px;
+    color: #666;
   }
   
   /* This makes the "Sign Up" button's border white, which looks better on a dark background */
-  .mat-stroked-button {
+  .mat-stroked-button, .mat-raised-button {
     border-color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .navbar {
+      padding: 0 16px;
+    }
+    
+    .user-name {
+      display: none; /* Hide user name on mobile to save space */
+    }
+    
+    .nav-links {
+      gap: 4px;
+    }
+    
+    .user-actions {
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo span {
+      display: none; /* Hide logo text on very small screens */
+    }
+    
+    .nav-links a {
+      padding: 0 8px;
+      font-size: 14px;
+    }
   }

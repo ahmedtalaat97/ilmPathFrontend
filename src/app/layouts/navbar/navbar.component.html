@@ -1,29 +1,77 @@
 <mat-toolbar color="primary" class="navbar">
     <a routerLink="/" class="logo">
       <mat-icon>school</mat-icon>
-      <span>عlmPath</span>
+      <span>IlmPath</span>
     </a>
   
     <div class="nav-links">
       <a mat-button routerLink="/courses">Courses</a>
+      
+      <!-- Teacher Dashboard Link - Show for teachers -->
+      <a mat-button routerLink="/teacher" *ngIf="isLoggedIn">
+        <mat-icon>dashboard</mat-icon>
+        Teach
+      </a>
       
       <button mat-button [matMenuTriggerFor]="categoriesMenu">Categories</button>
     </div>
   
     <div class="spacer"></div>
   
-    <div class="user-actions">
+    <!-- Show when NOT logged in -->
+    <div class="user-actions" *ngIf="!isLoggedIn">
+      <a mat-button routerLink="/login">Log In</a>
+      <a mat-raised-button color="accent" routerLink="/register">Sign Up</a>
+    </div>
+
+    <!-- Show when logged in -->
+    <div class="user-actions" *ngIf="isLoggedIn">
       <button mat-icon-button aria-label="Shopping cart">
         <mat-icon>shopping_cart</mat-icon>
       </button>
-      <a mat-button routerLink="/login">Log In</a>
-      <a mat-stroked-button color="accent" routerLink="/signup">Sign Up</a>
+      
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      
+      <span class="user-name">{{ getUserDisplayName() }}</span>
     </div>
   </mat-toolbar>
   
+  <!-- Categories Menu -->
   <mat-menu #categoriesMenu="matMenu">
     <button mat-menu-item>Development</button>
     <button mat-menu-item>Business</button>
     <button mat-menu-item>Design</button>
     <button mat-menu-item>Marketing</button>
+  </mat-menu>
+
+  <!-- User Menu -->
+  <mat-menu #userMenu="matMenu">
+    <div class="user-info">
+      <div class="user-name-menu">{{ getUserDisplayName() }}</div>
+      <div class="user-email">{{ currentUser?.email }}</div>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item>
+      <mat-icon>person</mat-icon>
+      <span>Profile</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>bookmark</mat-icon>
+      <span>My Courses</span>
+    </button>
+    <button mat-menu-item routerLink="/teacher">
+      <mat-icon>school</mat-icon>
+      <span>Teacher Dashboard</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>favorite</mat-icon>
+      <span>Wishlist</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
   </mat-menu>
