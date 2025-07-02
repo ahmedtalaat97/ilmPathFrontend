@@ -1,0 +1,19 @@
+<div class="chat-avatar" (click)="toggleChat()" *ngIf="!isOpen">
+  <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="AI Chat" />
+</div>
+
+<div class="chat-window" *ngIf="isOpen">
+  <div class="chat-header">
+    <span>Ask IlmPath AI</span>
+    <button class="close-btn" (click)="toggleChat()">&times;</button>
+  </div>
+  <div class="chat-history">
+    <div *ngFor="let msg of chatHistory" [ngClass]="msg.from">
+      <span>{{ msg.text }}</span>
+    </div>
+  </div>
+  <div class="chat-input">
+    <input [(ngModel)]="message" (keydown.enter)="sendMessage()" placeholder="Type your message..." />
+    <button (click)="sendMessage()">Send</button>
+  </div>
+</div> 

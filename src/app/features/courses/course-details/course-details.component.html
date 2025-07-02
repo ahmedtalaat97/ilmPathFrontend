@@ -1,0 +1,130 @@
+<div *ngIf="loading">Loading course details...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<div class="course-details-container" [@fadeInOut]>
+  <!-- Desktop: Two columns -->
+  <div class="main-content">
+    <mat-card class="details-card">
+      <ng-container *ngIf="!isMobile; else mobileCard">
+        <mat-card-header>
+          <mat-card-title>{{ course?.title }}</mat-card-title>
+          <mat-card-subtitle>Instructor: {{ course?.instructorName || 'Unknown' }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ course?.description }}</p>
+          <p><strong>Duration:</strong> {{ totalDuration }} minutes</p>
+          <h3>Course content</h3>
+          <mat-accordion *ngIf="sections.length; else noSections">
+            <mat-expansion-panel *ngFor="let section of sections">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ section.title }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{ lecturesBySection[section.id]?.length || 0 }} lectures
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <mat-list *ngIf="lecturesBySection[section.id]?.length; else noLectures">
+                <mat-list-item *ngFor="let lecture of lecturesBySection[section.id]">
+                  <span>{{ lecture.title }}</span>
+                  <span class="lecture-duration" style="margin-left:auto; display: block;">{{ lecture.durationInMinutes || 0 }} min</span>
+                </mat-list-item>
+              </mat-list>
+              <ng-template #noLectures>
+                <p style="margin: 0 16px;">No lectures in this section.</p>
+              </ng-template>
+            </mat-expansion-panel>
+          </mat-accordion>
+          <ng-template #noSections>
+            <p>No sections available for this course.</p>
+          </ng-template>
+        </mat-card-content>
+      </ng-container>
+      <ng-template #mobileCard>
+        <!-- Mobile: Merge summary and details -->
+        <img mat-card-image [src]="course?.thumbnailImageUrl || 'https://placehold.co/600x400?text=Course'" [alt]="course?.title">
+        <mat-card-content>
+          <div class="price-row">
+            <span class="price-label">Price:</span>
+            <span class="price-value">${{ course?.price }}</span>
+          </div>
+          <form (ngSubmit)="applyCoupon()" class="coupon-form">
+            <mat-form-field appearance="fill">
+              <mat-label>Coupon Code</mat-label>
+              <input matInput [formControl]="couponControl" placeholder="Enter coupon code">
+            </mat-form-field>
+            <button mat-flat-button color="primary" type="button" (click)="applyCoupon()">Apply</button>
+          </form>
+          <div *ngIf="couponApplied">
+            <mat-chip color="primary" selected>Coupon {{ couponApplied }} applied!</mat-chip>
+          </div>
+          <div class="summary-actions">
+            <button mat-flat-button color="accent" class="add-to-cart" (click)="addToCart()">Add to Cart</button>
+            <button mat-icon-button color="warn" aria-label="Add to wishlist">
+              <mat-icon>favorite_border</mat-icon>
+            </button>
+          </div>
+          <div class="mobile-details-separator"></div>
+          <mat-card-title>{{ course?.title }}</mat-card-title>
+          <mat-card-subtitle>Instructor: {{ course?.instructorName || 'Unknown' }}</mat-card-subtitle>
+          <p>{{ course?.description }}</p>
+          <p><strong>Duration:</strong> {{ totalDuration }} minutes</p>
+          <h3>Course content</h3>
+          <mat-accordion *ngIf="sections.length; else noSections">
+            <mat-expansion-panel *ngFor="let section of sections">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ section.title }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{ lecturesBySection[section.id]?.length || 0 }} lectures
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <mat-list *ngIf="lecturesBySection[section.id]?.length; else noLectures">
+                <mat-list-item *ngFor="let lecture of lecturesBySection[section.id]">
+                  <span>{{ lecture.title }}</span>
+                  <span class="lecture-duration" style="margin-left:auto; display: block;">{{ lecture.durationInMinutes || 0 }} min</span>
+                </mat-list-item>
+              </mat-list>
+              <ng-template #noLectures>
+                <p style="margin: 0 16px;">No lectures in this section.</p>
+              </ng-template>
+            </mat-expansion-panel>
+          </mat-accordion>
+          <ng-template #noSections>
+            <p>No sections available for this course.</p>
+          </ng-template>
+        </mat-card-content>
+      </ng-template>
+    </mat-card>
+  </div>
+
+  <!-- Desktop: Summary Card on the right -->
+  <div class="summary-card" *ngIf="!isMobile">
+    <mat-card>
+      <img mat-card-image [src]="course?.thumbnailImageUrl || 'https://placehold.co/600x400?text=Course'" [alt]="course?.title">
+      <mat-card-content>
+        <div class="price-row">
+          <span class="price-label">Price:</span>
+          <span class="price-value">${{ course?.price }}</span>
+        </div>
+        <form (ngSubmit)="applyCoupon()" class="coupon-form">
+          <mat-form-field appearance="fill">
+            <mat-label>Coupon Code</mat-label>
+            <input matInput [formControl]="couponControl" placeholder="Enter coupon code">
+          </mat-form-field>
+          <button mat-flat-button color="primary" type="button" (click)="applyCoupon()">Apply</button>
+        </form>
+        <div *ngIf="couponApplied">
+          <mat-chip color="primary" selected>Coupon {{ couponApplied }} applied!</mat-chip>
+        </div>
+        <div class="summary-actions">
+          <button mat-flat-button color="accent" class="add-to-cart" (click)="addToCart()">Add to Cart</button>
+          <button mat-icon-button color="warn" aria-label="Add to wishlist">
+            <mat-icon>favorite_border</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

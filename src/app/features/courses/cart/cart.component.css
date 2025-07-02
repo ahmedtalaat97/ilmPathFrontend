@@ -1,0 +1,137 @@
+.cart-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 24px 0;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.cart-item {
+  flex: 1 1 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  background: #23272b;
+  color: #f1f1f1;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  padding: 12px 18px;
+  width: 100%;
+}
+
+.cart-thumb {
+  width: 90px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #181a1b;
+}
+
+.cart-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cart-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-price {
+  color: #43e6a6;
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.cart-item button[mat-icon-button] {
+  margin-left: 12px;
+  align-self: center;
+}
+
+.cart-summary {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.total-label {
+  color: #b0b0b0;
+}
+.total-value {
+  color: #43e6a6;
+  font-size: 1.3rem;
+}
+
+.checkout-btn {
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 14px 0;
+  margin-top: 8px;
+}
+
+.empty-cart {
+  text-align: center;
+  color: #b0b0b0;
+  margin-top: 60px;
+}
+.empty-cart mat-icon {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+  color: #e64343;
+}
+
+@media (max-width: 800px) {
+  .cart-container {
+    max-width: 98vw;
+    padding: 12px 0;
+  }
+  .cart-items {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .cart-item {
+    max-width: 100%;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 8px;
+  }
+  .cart-thumb {
+    width: 100%;
+    height: 120px;
+  }
+  .cart-item button[mat-icon-button] {
+    margin-left: 0;
+    margin-top: 8px;
+    align-self: flex-start;
+  }
+}

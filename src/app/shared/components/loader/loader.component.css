@@ -1,0 +1,19 @@
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  width: 100%;
+}
+
+.snackbar-success {
+  background: #43e6a6 !important;
+  color: #222 !important;
+  font-weight: 600;
+}
+
+.snackbar-error {
+  background: #e64343 !important;
+  color: #fff !important;
+  font-weight: 600;
+} 

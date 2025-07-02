@@ -1,0 +1,90 @@
+<div class="chat-container">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="avatar-container">
+      <div class="avatar">
+        <mat-icon>smart_toy</mat-icon>
+      </div>
+      <div class="avatar-status">
+        <div class="status-dot"></div>
+        <span>AI Assistant</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="messages-container" #messageContainer>
+    <div class="messages-wrapper">
+      <!-- Welcome Message -->
+      <div class="message bot-message" *ngFor="let message of messages" [@messageAnimation]>
+        <div class="message-content">
+          <div class="message-avatar" *ngIf="!message.isUser">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+          <div class="message-bubble" [class.user-bubble]="message.isUser" [class.bot-bubble]="!message.isUser">
+            <p>{{ message.text }}</p>
+            <span class="message-time">{{ message.timestamp | date:'shortTime' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="message bot-message" *ngIf="isTyping" [@typingAnimation]>
+        <div class="message-content">
+          <div class="message-avatar">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+          <div class="message-bubble bot-bubble typing-bubble">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Responses -->
+  <div class="quick-responses" *ngIf="messages.length <= 1">
+    <mat-divider></mat-divider>
+    <div class="quick-responses-container">
+      <span class="quick-label">Quick questions:</span>
+      <div class="quick-chips">
+        <button *ngFor="let response of quickResponses" 
+                (click)="sendQuickResponse(response, $event)"
+                (mousedown)="$event.preventDefault()"
+                (touchstart)="$event.preventDefault()"
+                class="quick-chip-btn"
+                type="button">
+          {{ response }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-container">
+    <mat-card class="input-card">
+      <div class="input-wrapper">
+        <mat-form-field appearance="outline" class="message-input">
+          <input matInput 
+                 [(ngModel)]="newMessage" 
+                 placeholder="Type your message..."
+                 (keypress)="onKeyPress($event)"
+                 #messageInput
+                 autocomplete="off">
+          <mat-icon matSuffix>chat</mat-icon>
+        </mat-form-field>
+        <button mat-fab 
+                color="primary" 
+                class="send-button"
+                (click)="sendMessage()"
+                [disabled]="!newMessage.trim() || isTyping">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div> 

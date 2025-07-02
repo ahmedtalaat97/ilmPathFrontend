@@ -1,11 +1,34 @@
-<div class="page-container">
+<div class="page-container" [@fadeInOut]>
     <h2 class="page-title">Courses to get you started</h2>
-  
-    <div class="course-grid" *ngIf="courses.length > 0; else noCourses">
-      <app-course-card *ngFor="let course of courses" [course]="course"></app-course-card>
+    
+    <!-- Category Filter Indicator -->
+    <div class="category-filter" *ngIf="selectedCategoryId">
+      <mat-chip color="accent" selected>
+        <mat-icon>filter_list</mat-icon>
+        Category Filter Active
+        <button mat-icon-button (click)="clearCategoryFilter()" class="clear-filter-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-chip>
     </div>
   
-    <ng-template #noCourses>
-      <p>Loading courses...</p>
-    </ng-template>
+    <app-loader *ngIf="loading"></app-loader>
+    <ng-container *ngIf="!loading">
+      <div class="course-grid" *ngIf="courses.length > 0; else noCourses">
+        <app-course-card *ngFor="let course of courses" [course]="course"></app-course-card>
+      </div>
+      <mat-paginator
+        style="margin-top: 32px;"
+        [length]="totalCourses"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[4, 8, 16, 24]"
+        (page)="onPageChange($event)"
+        
+        showFirstLastButtons>
+      </mat-paginator>
+      <ng-template #noCourses>
+        <p>Loading courses...</p>
+      </ng-template>
+    </ng-container>
   </div>
