@@ -73,8 +73,15 @@ export class CourseService {
 
   private apiUrl = environment.apiUrl; 
 
-  getCourses(pageNumber: number = 1, pageSize: number = 10): Observable<PagedResult<Course>> {
-    const url = `${this.apiUrl}/Courses?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+  getCourses(pageNumber: number = 1, pageSize: number = 10, categoryId?: number | null): Observable<PagedResult<Course>> {
+    let url: string;
+    
+    if (categoryId) {
+      url = `${this.apiUrl}/Courses/category?CategoryId=${categoryId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+    } else {
+      url = `${this.apiUrl}/Courses?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+    }
+    
     console.log('Making API request to:', url);
     return this.http.get<PagedResult<Course>>(url);
   }

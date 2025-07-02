@@ -1,0 +1,32 @@
+<div class="cart-container" [@fadeInOut]>
+  <app-loader *ngIf="loading"></app-loader>
+  <ng-container *ngIf="!loading">
+    <ng-container *ngIf="cart && cart.items.length > 0; else emptyCart">
+      <h2>Your Cart</h2>
+      <div class="cart-items">
+        <mat-card class="cart-item" *ngFor="let item of cart.items">
+          <img [src]="item.thumbnailImageUrl || 'https://placehold.co/120x80?text=Course'" [alt]="item.title" class="cart-thumb">
+          <div class="cart-info">
+            <div class="cart-title">{{ item.title }}</div>
+            <div class="cart-price">${{ item.price }}</div>
+          </div>
+          <button mat-icon-button color="warn" (click)="removeItem(item)" aria-label="Remove from cart">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card>
+      </div>
+      <div class="cart-summary">
+        <div class="total-label">Total:</div>
+        <div class="total-value">${{ cart.totalPrice }}</div>
+      </div>
+      <button mat-flat-button color="primary" class="checkout-btn" (click)="proceedToCheckout()">Proceed to Checkout</button>
+    </ng-container>
+    <ng-template #emptyCart>
+      <div class="empty-cart">
+        <mat-icon>remove_shopping_cart</mat-icon>
+        <h3>Your cart is empty</h3>
+        <p>Browse courses and add them to your cart!</p>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>

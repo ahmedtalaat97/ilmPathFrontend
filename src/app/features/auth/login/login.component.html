@@ -32,7 +32,7 @@
 
         <button mat-flat-button color="primary" type="submit" 
                 [disabled]="loginForm.invalid || isLoading" class="full-width login-button">
-          <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+          <app-loader [diameter]="20" *ngIf="isLoading"></app-loader>
           <span *ngIf="!isLoading">Sign In</span>
           <span *ngIf="isLoading">Signing In...</span>
         </button>

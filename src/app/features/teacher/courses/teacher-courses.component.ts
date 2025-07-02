@@ -10,6 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-teacher-courses',
@@ -22,7 +23,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatMenuModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatDividerModule
+    MatDividerModule,
+    LoaderComponent
   ],
   templateUrl: './teacher-courses.component.html',
   styleUrls: ['./teacher-courses.component.css']

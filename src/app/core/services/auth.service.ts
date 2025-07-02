@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, Subject } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { User, LoginRequest, RegisterRequest, AuthResponse, RegisterResponse } from '../../shared/models/user.model';
@@ -13,6 +13,8 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private tokenKey = 'ilmpath_token';
   private tokenExpirationKey = 'ilmpath_token_expiration';
+
+  public loginStatus$ = new Subject<boolean>();
 
   constructor(private http: HttpClient) {
     console.log('AuthService initialized with API URL:', this.apiUrl);
@@ -67,6 +69,7 @@ export class AuthService {
         console.log('Login successful:', response);
         this.storeTokens(response.token, response.expiration);
         this.setUserFromToken(response.token);
+        this.loginStatus$.next(true);
       }),
       catchError(error => {
         console.error('Login error:', error);
@@ -94,6 +97,7 @@ export class AuthService {
     console.log('Logging out user');
     this.clearTokens();
     this.currentUserSubject.next(null);
+    this.loginStatus$.next(false);
   }
 
   private storeTokens(token: string, expiration: Date): void {

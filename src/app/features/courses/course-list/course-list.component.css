@@ -18,3 +18,29 @@
   max-width: 1400px;
   margin: 0 auto;
 }
+
+.category-filter {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.category-filter mat-chip {
+  background-color: #7b1fa2;
+  color: white;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clear-filter-btn {
+  margin-left: 8px;
+  color: white;
+}
+
+.clear-filter-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

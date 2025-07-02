@@ -16,6 +16,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard] 
   },
   { 
+    path: 'courses/:id', 
+    loadComponent: () => import('./features/courses/course-details/course-details.component').then(c => c.CourseDetailsComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
     path: 'teacher', 
     loadComponent: () => import('./features/teacher/dashboard/teacher-dashboard.component').then(c => c.TeacherDashboardComponent),
     canActivate: [AuthGuard],
@@ -34,6 +39,16 @@ export const routes: Routes = [
         loadComponent: () => import('./features/teacher/course-builder/course-builder.component').then(c => c.CourseBuilderComponent)
       }
     ]
+  },
+  { 
+    path: 'cart', 
+    loadComponent: () => import('./features/courses/cart/cart.component').then(c => c.CartComponent),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'chat', 
+    loadComponent: () => import('./features/ai-chat/ai-chat.component').then(c => c.AiChatComponent)
+   
   },
   { path: '', redirectTo: 'courses', pathMatch: 'full' },
   { path: '**', redirectTo: 'courses' } // Wildcard route for 404 pages
