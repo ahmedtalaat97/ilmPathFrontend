@@ -31,9 +31,11 @@ import {
     CreateCourseRequest,
     CreateSectionRequest,
     CreateLessonRequest,
+    UploadResponse,
 } from '../../courses/course.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { forkJoin, switchMap, catchError, of } from 'rxjs';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 // Interfaces for type safety
 interface Lesson {
@@ -44,6 +46,8 @@ interface Lesson {
     content?: string;
     videoUrl?: string;
     order: number;
+    videoFile?: File; // For temporary storage of video file
+    videoPreviewUrl?: string; // For preview URL
 }
 
 interface Section {
@@ -72,6 +76,7 @@ interface Section {
         MatMenuModule,
         DragDropModule,
         MatProgressSpinnerModule,
+        MatProgressBarModule,
         MatSnackBarModule,
     ],
     templateUrl: './course-builder.component.html',
@@ -241,6 +246,9 @@ export class CourseBuilderComponent implements OnInit {
             content: [lesson.content || ''],
             videoUrl: [lesson.videoUrl || ''],
             order: [lesson.order || 0],
+            isUploadingVideo: [false], // Added for video upload status
+            videoFile: [null], // For storing the file temporarily
+            videoPreviewUrl: [''], // For storing the preview URL
         });
     }
 
@@ -430,7 +438,7 @@ export class CourseBuilderComponent implements OnInit {
                         return of(courseResponse);
                     }
 
-                    // Create sections and lessons
+                    // Create sections and lessons with video uploads
                     const sectionRequests = curriculum.map((section, sectionIndex) => {
                         const sectionData: CreateSectionRequest = {
                             title: section.title,
@@ -454,13 +462,28 @@ export class CourseBuilderComponent implements OnInit {
                                                 type: lesson.type,
                                                 duration: lesson.duration || 0,
                                                 content: lesson.content,
-                                                videoUrl: lesson.videoUrl,
+                                                videoUrl: '', // Will be updated after video upload
                                                 order: lessonIndex,
                                             };
 
                                             return this.courseService.createLesson(
                                                 sectionResponse.id,
                                                 lessonData
+                                            ).pipe(
+                                                switchMap((lessonResponse) => {
+                                                    // Check if this lesson has a video file to upload
+                                                    const videoFile = lesson.videoFile;
+                                                    if (videoFile && lesson.type === 'video') {
+                                                        // Upload the video for this lesson
+                                                        return this.uploadVideoForLesson(
+                                                            videoFile, 
+                                                            lessonResponse.id, 
+                                                            sectionIndex, 
+                                                            lessonIndex
+                                                        ).then(() => lessonResponse);
+                                                    }
+                                                    return of(lessonResponse);
+                                                })
                                             );
                                         }
                                     );
@@ -556,9 +579,93 @@ export class CourseBuilderComponent implements OnInit {
     onThumbnailSelected(event: any): void {
         const file = event.target.files[0];
         if (file) {
-            // TODO: Implement file upload
-            console.log('Thumbnail selected:', file);
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                this.snackBar.open('Please select a valid image file.', 'Close', {
+                    duration: 3000,
+                });
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                this.snackBar.open('Image file size must be less than 5MB.', 'Close', {
+                    duration: 3000,
+                });
+                return;
+            }
+
+            // Show immediate preview while uploading
+            this.showImagePreview(file);
+
+            // Upload to backend server
+            this.uploadThumbnailToServer(file);
         }
+    }
+
+    private showImagePreview(file: File): void {
+        // Show immediate preview for better UX
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+            // Temporarily show preview while uploading
+            const previewUrl = e.target.result;
+            const thumbnailPreview = document.querySelector(
+                '.thumbnail-image'
+            ) as HTMLImageElement;
+            if (thumbnailPreview) {
+                thumbnailPreview.src = previewUrl;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    private uploadThumbnailToServer(file: File): void {
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('thumbnail', file);
+        formData.append('type', 'course-thumbnail');
+
+        // Show loading state
+        this.isLoading = true;
+        this.snackBar.open('Uploading thumbnail...', '', { duration: 1000 });
+
+        // Upload to backend (you'll need to implement this endpoint)
+        this.courseService.uploadThumbnail(formData).subscribe({
+            next: (response: UploadResponse) => {
+                // Backend returns the file URL
+                const thumbnailUrl = response.url; // e.g., "https://yourserver.com/uploads/thumbnails/abc123.jpg"
+
+                // Update form with server URL (not Base64)
+                this.courseForm.patchValue({
+                    thumbnailImageUrl: thumbnailUrl,
+                });
+
+                this.courseForm.markAsDirty();
+                this.isLoading = false;
+
+                this.snackBar.open('Thumbnail uploaded successfully!', 'Close', {
+                    duration: 2000,
+                });
+            },
+            error: (error: any) => {
+                console.error('Upload failed:', error);
+                this.isLoading = false;
+
+                // Reset preview on error
+                this.courseForm.patchValue({
+                    thumbnailImageUrl: '',
+                });
+
+                this.snackBar.open(
+                    'Failed to upload thumbnail. Please try again.',
+                    'Close',
+                    {
+                        duration: 3000,
+                    }
+                );
+            },
+        });
     }
 
     // Preview mode
@@ -667,6 +774,7 @@ export class CourseBuilderComponent implements OnInit {
                     content: [''],
                     videoUrl: [lecture.videoUrl || ''],
                     order: [lecture.order || lessonIndex],
+                    isUploadingVideo: [false], // Added for video upload status
                 });
 
                 lessonsArray.push(lessonForm);
@@ -684,23 +792,111 @@ export class CourseBuilderComponent implements OnInit {
 
     // Helper methods
     getTotalLessons(): number {
-        return this.curriculumArray.controls.reduce((total, section) => {
-            const lessonsArray = section.get('lessons') as FormArray;
-            return total + lessonsArray.length;
-        }, 0);
+        return this.curriculumArray.controls
+            .map(section => this.getLessonsArray(this.curriculumArray.controls.indexOf(section)).length)
+            .reduce((total, sectionLessons) => total + sectionLessons, 0);
     }
 
     getTotalDuration(): number {
-        return this.curriculumArray.controls.reduce((total, section) => {
-            const lessonsArray = section.get('lessons') as FormArray;
-            return (
-                total +
-                lessonsArray.controls.reduce((sectionTotal, lesson) => {
-                    const duration = lesson.get('duration')?.value || 0;
-                    return sectionTotal + duration;
-                }, 0)
-            );
-        }, 0);
+        let totalDuration = 0;
+        this.curriculumArray.controls.forEach((section, sectionIndex) => {
+            this.getLessonsArray(sectionIndex).controls.forEach(lesson => {
+                const duration = lesson.get('duration')?.value || 0;
+                totalDuration += parseInt(duration);
+            });
+        });
+        return totalDuration;
+    }
+
+    // Video upload methods
+    onVideoFileSelected(event: any, sectionIndex: number, lessonIndex: number): void {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('video/')) {
+            this.snackBar.open('Please select a valid video file.', 'Close', {
+                duration: 3000,
+            });
+            return;
+        }
+
+        // Validate file size (max 500MB)
+        const maxSize = 500 * 1024 * 1024; // 500MB in bytes
+        if (file.size > maxSize) {
+            this.snackBar.open('Video file size must be less than 500MB.', 'Close', {
+                duration: 3000,
+            });
+            return;
+        }
+
+        // Store video file temporarily in the lesson form
+        const lessonForm = this.getLessonFormGroup(sectionIndex, lessonIndex);
+        
+        // Create a temporary preview URL
+        const previewUrl = URL.createObjectURL(file);
+        
+        // Store the file and preview URL in the form
+        lessonForm.patchValue({ 
+            videoFile: file,  // Store the actual file
+            videoUrl: `📁 ${file.name} (${this.formatFileSize(file.size)})`, // Show filename as placeholder
+            videoPreviewUrl: previewUrl // For potential preview functionality
+        });
+        
+        lessonForm.markAsDirty();
+        
+        this.snackBar.open(`Video "${file.name}" selected successfully!`, 'Close', {
+            duration: 3000,
+        });
+    }
+
+    private formatFileSize(bytes: number): string {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Update the uploadVideoForLesson to handle the actual upload during course creation
+    private uploadVideoForLesson(file: File, lectureId: number, sectionIndex: number, lessonIndex: number): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const lessonForm = this.getLessonFormGroup(sectionIndex, lessonIndex);
+            
+            // Set loading state
+            lessonForm.patchValue({ isUploadingVideo: true });
+
+            this.courseService.uploadLessonVideo(lectureId, file).subscribe({
+                next: (response) => {
+                    // Update the lesson with the video URL
+                    lessonForm.patchValue({ 
+                        videoUrl: response.videoUrl,
+                        isUploadingVideo: false 
+                    });
+                    
+                    resolve(response.videoUrl);
+                },
+                error: (error) => {
+                    console.error('Video upload failed:', error);
+                    lessonForm.patchValue({ isUploadingVideo: false });
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    isVideoUploading(sectionIndex: number, lessonIndex: number): boolean {
+        return this.getLessonFormGroup(sectionIndex, lessonIndex).get('isUploadingVideo')?.value || false;
+    }
+
+    hasVideoFile(sectionIndex: number, lessonIndex: number): boolean {
+        const videoFile = this.getLessonFormGroup(sectionIndex, lessonIndex).get('videoFile')?.value;
+        return !!videoFile;
+    }
+
+    hasVideoUrl(sectionIndex: number, lessonIndex: number): boolean {
+        const videoUrl = this.getLessonFormGroup(sectionIndex, lessonIndex).get('videoUrl')?.value;
+        return !!videoUrl && videoUrl.trim() !== '' && !videoUrl.startsWith('📁');
     }
 
     dropSection(event: CdkDragDrop<string[]>): void {
@@ -709,5 +905,26 @@ export class CourseBuilderComponent implements OnInit {
             this.curriculumArray.removeAt(event.previousIndex);
             this.curriculumArray.insert(event.currentIndex, section);
         }
+    }
+
+    // Helper methods for video management
+    clearVideoFile(sectionIndex: number, lessonIndex: number): void {
+        const lessonForm = this.getLessonFormGroup(sectionIndex, lessonIndex);
+        const previewUrl = lessonForm.get('videoPreviewUrl')?.value;
+        
+        // Clean up the object URL to prevent memory leaks
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+        
+        lessonForm.patchValue({
+            videoFile: null,
+            videoUrl: '',
+            videoPreviewUrl: ''
+        });
+        
+        lessonForm.markAsDirty();
+        
+        this.snackBar.open('Video file removed', 'Close', { duration: 2000 });
     }
 }

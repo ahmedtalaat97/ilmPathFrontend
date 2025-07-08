@@ -113,18 +113,59 @@
 }
 
 .thumbnail-preview {
+  position: relative;
   width: 300px;
   height: 200px;
   border-radius: 12px;
   overflow: hidden;
   border: 2px dashed #555;
   background-color: #2a2a2a;
+  transition: border-color 0.3s ease;
 }
 
-.thumbnail-preview img {
+.thumbnail-preview:hover {
+  border-color: #667eea;
+}
+
+.thumbnail-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.thumbnail-preview:hover .thumbnail-image {
+  transform: scale(1.05);
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.thumbnail-preview:hover .thumbnail-overlay {
+  opacity: 1;
+}
+
+.remove-thumbnail {
+  background-color: #f44336 !important;
+  color: white !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.remove-thumbnail:hover {
+  background-color: #d32f2f !important;
+  transform: scale(1.1);
 }
 
 .upload-controls {
@@ -135,14 +176,26 @@
 }
 
 .upload-controls button {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   align-self: flex-start;
+  transition: transform 0.2s ease;
+}
+
+.upload-controls button:hover {
+  transform: translateY(-2px);
+}
+
+.upload-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .upload-hint {
   margin: 0;
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 /* Curriculum Builder */

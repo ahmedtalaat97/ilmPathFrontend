@@ -1,0 +1,27 @@
+.video-upload-section {
+  .upload-progress {
+    margin-top: 8px;
+    
+    .upload-status {
+      margin: 8px 0 0 0;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+  }
+
+  .upload-success {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: #4caf50;
+    font-size: 14px;
+    
+    mat-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+    }
+  }
+} 
