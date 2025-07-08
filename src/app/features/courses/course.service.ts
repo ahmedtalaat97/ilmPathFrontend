@@ -62,6 +62,18 @@ export interface LessonResponse {
   isPreviewAllowed: boolean;
 }
 
+export interface UploadResponse {
+  url: string;
+  fileName: string;
+  size: number;
+}
+
+// Add new interface for video upload response
+export interface VideoUploadResponse {
+  videoUrl: string;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -131,5 +143,22 @@ export class CourseService {
     const url = `${this.apiUrl}/sections/${sectionId}/lectures`;
     console.log('Getting lectures for section:', sectionId);
     return this.http.get<LessonResponse[]>(url);
+  }
+
+  // Upload thumbnail file
+  uploadThumbnail(formData: FormData): Observable<UploadResponse> {
+    const url = `${this.apiUrl}/uploads/thumbnail`;
+    console.log('Uploading thumbnail file');
+    return this.http.post<UploadResponse>(url, formData);
+  }
+
+  // Upload video for a lecture
+  uploadLessonVideo(lectureId: number, videoFile: File): Observable<VideoUploadResponse> {
+    const formData = new FormData();
+    formData.append('videoFile', videoFile);
+    
+    const url = `${this.apiUrl}/lectures/${lectureId}/video`;
+    console.log('Uploading video for lecture:', lectureId);
+    return this.http.post<VideoUploadResponse>(url, formData);
   }
 }
