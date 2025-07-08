@@ -35,6 +35,7 @@ import {
     CreateLessonRequest,
     CourseCreationResponse,
 } from '../../courses/course.service';
+import { CategoryService, Category } from '../../courses/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { forkJoin, switchMap, catchError, of } from 'rxjs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -101,20 +102,15 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         { value: 'assignment', label: 'Assignment', icon: 'assignment' },
     ];
 
-    // Mock categories - in production, fetch from API
-    categories = [
-        { id: 1, name: 'Web Development' },
-        { id: 2, name: 'Data Science' },
-        { id: 3, name: 'Mobile Development' },
-        { id: 4, name: 'Cloud Computing' },
-        { id: 5, name: 'Business & Entrepreneurship' },
-    ];
+    // Categories fetched from API
+    categories: Category[] = [];
 
     constructor(
         private fb: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
         private courseService: CourseService,
+        private categoryService: CategoryService,
         private snackBar: MatSnackBar,
         private authService: AuthService
     ) {
@@ -124,14 +120,17 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.initializeForm();
 
-        // Check if we're in edit mode
-        this.route.paramMap.subscribe((params) => {
-            const id = params.get('id');
-            if (id) {
-                this.courseId = parseInt(id, 10);
-                this.isEditMode = true;
-                this.loadCourseData();
-            }
+        // Fetch categories first
+        this.loadCategories().then(() => {
+            // Check if we're in edit mode after categories are loaded
+            this.route.paramMap.subscribe((params) => {
+                const id = params.get('id');
+                if (id) {
+                    this.courseId = parseInt(id, 10);
+                    this.isEditMode = true;
+                    this.loadCourseData();
+                }
+            });
         });
     }
 
@@ -994,5 +993,23 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         lessonForm.markAsDirty();
         
         this.snackBar.open('Video file removed', 'Close', { duration: 2000 });
+    }
+
+    private loadCategories(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.categoryService.getCategories().subscribe({
+                next: (categories) => {
+                    this.categories = categories;
+                    resolve();
+                },
+                error: (error) => {
+                    console.error('Error loading categories:', error);
+                    this.snackBar.open('Failed to load categories. Please try again.', 'Close', {
+                        duration: 5000,
+                    });
+                    reject(error);
+                },
+            });
+        });
     }
 }
