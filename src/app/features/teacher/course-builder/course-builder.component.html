@@ -84,13 +84,13 @@
               <h3>Course Thumbnail</h3>
               <div class="thumbnail-upload">
                 <div class="thumbnail-preview">
-                  <img [src]="courseForm.get('thumbnailImageUrl')?.value || 'https://placehold.co/300x200?text=Upload+Thumbnail'" 
+                  <img [src]="getThumbnailUrl()" 
                        alt="Course thumbnail"
                        class="thumbnail-image">
-                  @if (courseForm.get('thumbnailImageUrl')?.value && courseForm.get('thumbnailImageUrl')?.value !== '') {
+                  @if (thumbnailFile || (courseForm.get('thumbnailImageUrl')?.value && courseForm.get('thumbnailImageUrl')?.value !== '')) {
                     <div class="thumbnail-overlay">
                       <button mat-icon-button class="remove-thumbnail" 
-                              (click)="courseForm.patchValue({thumbnailImageUrl: ''})"
+                              (click)="clearThumbnail()"
                               matTooltip="Remove thumbnail">
                         <mat-icon>close</mat-icon>
                       </button>
@@ -101,11 +101,17 @@
                   <input #fileInput type="file" accept="image/*" (change)="onThumbnailSelected($event)" hidden>
                   <button mat-raised-button color="primary" (click)="fileInput.click()" type="button">
                     <mat-icon>cloud_upload</mat-icon>
-                    {{ courseForm.get('thumbnailImageUrl')?.value ? 'Change' : 'Upload' }} Thumbnail
+                    {{ thumbnailFile || courseForm.get('thumbnailImageUrl')?.value ? 'Change' : 'Upload' }} Thumbnail
                   </button>
                   <div class="upload-info">
                     <p class="upload-hint">Recommended size: 750x422 pixels (16:9 ratio)</p>
                     <p class="upload-hint">Supported formats: JPG, PNG, WebP (max 5MB)</p>
+                    @if (thumbnailFile) {
+                      <p class="upload-status">
+                        <mat-icon color="primary">attach_file</mat-icon>
+                        File selected: {{ thumbnailFile.name }} ({{ formatFileSize(thumbnailFile.size) }})
+                      </p>
+                    }
                   </div>
                 </div>
               </div>

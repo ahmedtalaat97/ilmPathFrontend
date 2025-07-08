@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     FormBuilder,
@@ -28,10 +28,12 @@ import {
 } from '@angular/cdk/drag-drop';
 import {
     CourseService,
+    CreateCourseWithFileRequest,
     CreateCourseRequest,
+    UpdateCourseWithFileRequest,
     CreateSectionRequest,
     CreateLessonRequest,
-    UploadResponse,
+    CourseCreationResponse,
 } from '../../courses/course.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { forkJoin, switchMap, catchError, of } from 'rxjs';
@@ -82,12 +84,14 @@ interface Section {
     templateUrl: './course-builder.component.html',
     styleUrls: ['./course-builder.component.css'],
 })
-export class CourseBuilderComponent implements OnInit {
+export class CourseBuilderComponent implements OnInit, OnDestroy {
     courseForm!: FormGroup;
     isEditMode = false;
     courseId: number | null = null;
     activeTab = 0;
     isLoading = false;
+    thumbnailFile: File | null = null; // Store the selected thumbnail file
+    thumbnailPreviewUrl: string | null = null; // Store the preview URL for the selected thumbnail
 
     // Lesson types for dropdown
     lessonTypes = [
@@ -129,6 +133,13 @@ export class CourseBuilderComponent implements OnInit {
                 this.loadCourseData();
             }
         });
+    }
+
+    ngOnDestroy(): void {
+        // Clean up thumbnail preview URL to prevent memory leaks
+        if (this.thumbnailPreviewUrl) {
+            URL.revokeObjectURL(this.thumbnailPreviewUrl);
+        }
     }
 
     initializeForm(): void {
@@ -313,33 +324,6 @@ export class CourseBuilderComponent implements OnInit {
             : `${hours}h`;
     }
 
-    // Existing methods...
-    loadCourse(): void {
-        if (this.courseId) {
-            const courseIdNum = parseInt(this.courseId.toString());
-            this.courseService.getCourseById(courseIdNum).subscribe({
-                next: (course: any) => {
-                    this.courseForm.patchValue({
-                        title: course.title,
-                        description: course.description,
-                        price: course.price,
-                        categoryId: course.categoryId,
-                        thumbnailImageUrl: course.thumbnailImageUrl,
-                        isPublished: course.isPublished,
-                    });
-                    // Note: Curriculum loading will be implemented when backend supports it
-                },
-                error: (error: any) => {
-                    console.error('Error loading course:', error);
-                    this.snackBar.open('Failed to load course', 'Close', {
-                        duration: 3000,
-                    });
-                    this.router.navigate(['/teacher/courses']);
-                },
-            });
-        }
-    }
-
     onSubmit(): void {
         if (this.courseForm.invalid) {
             this.snackBar.open('Please fill in all required fields', 'Close', {
@@ -360,13 +344,13 @@ export class CourseBuilderComponent implements OnInit {
         this.isLoading = true;
 
         const formValue = this.courseForm.value;
-        const courseData: CreateCourseRequest = {
+        const courseData: CreateCourseWithFileRequest = {
             title: formValue.title,
             description: formValue.description,
             price: formValue.price,
             instructorId: currentUser.id,
             categoryId: formValue.categoryId,
-            thumbnailImageUrl: formValue.thumbnailImageUrl,
+            thumbnailFile: this.thumbnailFile || undefined, // Convert null to undefined
             isPublished: formValue.isPublished || false,
         };
 
@@ -378,8 +362,17 @@ export class CourseBuilderComponent implements OnInit {
             })) || [];
 
         if (this.isEditMode && this.courseId) {
-            // Update existing course
-            this.updateCourseWithCurriculum(courseData, curriculum);
+            // Update existing course - for now, just update basic info
+            // TODO: Implement full curriculum update for edit mode
+            const updateData = {
+                title: formValue.title,
+                description: formValue.description,
+                price: formValue.price,
+                categoryId: formValue.categoryId,
+                thumbnailImageUrl: formValue.thumbnailImageUrl, // Keep existing logic for edit mode
+                isPublished: formValue.isPublished || false,
+            };
+            this.updateCourseWithCurriculum(updateData, curriculum);
         } else {
             // Create new course
             this.createCourseWithCurriculum(courseData, curriculum);
@@ -387,14 +380,37 @@ export class CourseBuilderComponent implements OnInit {
     }
 
     private updateCourseWithCurriculum(
-        courseData: CreateCourseRequest,
+        courseData: any,
         curriculum: any[]
     ): void {
         if (!this.courseId) return;
 
+        const formValue = this.courseForm.value;
+        
+        // Determine if we need to use the file upload version
+        const shouldUseFileUpload = this.thumbnailFile !== null;
+        
+        let updateObservable;
+        
+        if (shouldUseFileUpload) {
+            // Use the file upload version
+            const updateDataWithFile: UpdateCourseWithFileRequest = {
+                title: formValue.title,
+                description: formValue.description,
+                price: formValue.price,
+                isPublished: formValue.isPublished || false,
+                categoryId: formValue.categoryId,
+                thumbnailImageUrl: formValue.thumbnailImageUrl,
+                thumbnailFile: this.thumbnailFile || undefined,
+            };
+            updateObservable = this.courseService.updateCourseWithFile(this.courseId, updateDataWithFile);
+        } else {
+            // Use the regular JSON version
+            updateObservable = this.courseService.updateCourse(this.courseId, courseData);
+        }
+
         // First update the course basic info
-        this.courseService
-            .updateCourse(this.courseId, courseData)
+        updateObservable
             .pipe(
                 switchMap(() => {
                     // Now handle curriculum updates
@@ -546,12 +562,12 @@ export class CourseBuilderComponent implements OnInit {
     }
 
     createCourseWithCurriculum(
-        courseData: CreateCourseRequest,
+        courseData: CreateCourseWithFileRequest,
         curriculum: any[]
     ): void {
         // First create the course
         this.courseService
-            .createCourse(courseData)
+            .createCourse(courseData) // Use the corrected method name
             .pipe(
                 switchMap((courseResponse) => {
                     console.log('Course created:', courseResponse);
@@ -678,76 +694,46 @@ export class CourseBuilderComponent implements OnInit {
                 return;
             }
 
-            // Show immediate preview while uploading
-            this.showImagePreview(file);
+            // Clean up previous preview URL to prevent memory leaks
+            if (this.thumbnailPreviewUrl) {
+                URL.revokeObjectURL(this.thumbnailPreviewUrl);
+            }
 
-            // Upload to backend server
-            this.uploadThumbnailToServer(file);
+            // Store the thumbnail file for later upload
+            this.thumbnailFile = file;
+            this.thumbnailPreviewUrl = URL.createObjectURL(file); // Set preview URL
+
+            // Mark form as dirty
+            this.courseForm.markAsDirty();
+
+            this.snackBar.open('Thumbnail selected successfully!', 'Close', {
+                duration: 2000,
+            });
         }
     }
 
-    private showImagePreview(file: File): void {
-        // Show immediate preview for better UX
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-            // Temporarily show preview while uploading
-            const previewUrl = e.target.result;
-            const thumbnailPreview = document.querySelector(
-                '.thumbnail-image'
-            ) as HTMLImageElement;
-            if (thumbnailPreview) {
-                thumbnailPreview.src = previewUrl;
-            }
-        };
-        reader.readAsDataURL(file);
+    // Method to clear thumbnail
+    clearThumbnail(): void {
+        // Clean up preview URL
+        if (this.thumbnailPreviewUrl) {
+            URL.revokeObjectURL(this.thumbnailPreviewUrl);
+            this.thumbnailPreviewUrl = null;
+        }
+        
+        // Clear file and form field
+        this.thumbnailFile = null;
+        this.courseForm.patchValue({ thumbnailImageUrl: '' });
+        this.courseForm.markAsDirty();
+        
+        this.snackBar.open('Thumbnail removed', 'Close', { duration: 2000 });
     }
 
-    private uploadThumbnailToServer(file: File): void {
-        // Create FormData for file upload
-        const formData = new FormData();
-        formData.append('thumbnail', file);
-        formData.append('type', 'course-thumbnail');
-
-        // Show loading state
-        this.isLoading = true;
-        this.snackBar.open('Uploading thumbnail...', '', { duration: 1000 });
-
-        // Upload to backend (you'll need to implement this endpoint)
-        this.courseService.uploadThumbnail(formData).subscribe({
-            next: (response: UploadResponse) => {
-                // Backend returns the file URL
-                const thumbnailUrl = response.url; // e.g., "https://yourserver.com/uploads/thumbnails/abc123.jpg"
-
-                // Update form with server URL (not Base64)
-                this.courseForm.patchValue({
-                    thumbnailImageUrl: thumbnailUrl,
-                });
-
-                this.courseForm.markAsDirty();
-                this.isLoading = false;
-
-                this.snackBar.open('Thumbnail uploaded successfully!', 'Close', {
-                    duration: 2000,
-                });
-            },
-            error: (error: any) => {
-                console.error('Upload failed:', error);
-                this.isLoading = false;
-
-                // Reset preview on error
-                this.courseForm.patchValue({
-                    thumbnailImageUrl: '',
-                });
-
-                this.snackBar.open(
-                    'Failed to upload thumbnail. Please try again.',
-                    'Close',
-                    {
-                        duration: 3000,
-                    }
-                );
-            },
-        });
+    // Get the current thumbnail URL (either preview or existing)
+    getThumbnailUrl(): string {
+        // Priority: preview URL (newly selected) > existing thumbnailImageUrl > placeholder
+        return this.thumbnailPreviewUrl || 
+               this.courseForm.get('thumbnailImageUrl')?.value || 
+               'https://placehold.co/300x200?text=Upload+Thumbnail';
     }
 
     // Preview mode
@@ -823,11 +809,9 @@ export class CourseBuilderComponent implements OnInit {
             title: course.title,
             description: course.description,
             price: course.price,
-            level: course.level,
-            category: course.category,
-            language: course.language,
-            requirements: course.requirements || '',
-            whatYoullLearn: course.whatYoullLearn || '',
+            categoryId: course.categoryId,
+            thumbnailImageUrl: course.thumbnailImageUrl || '',
+            isPublished: course.isPublished || false,
         });
     }
 
