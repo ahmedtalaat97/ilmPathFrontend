@@ -16,6 +16,17 @@ export interface CreateCourseRequest {
   isPublished?: boolean;
 }
 
+// New interface for course creation with file
+export interface CreateCourseWithFileRequest {
+  title: string;
+  description: string;
+  price: number;
+  instructorId: string;
+  categoryId?: number;
+  thumbnailFile?: File;
+  isPublished?: boolean;
+}
+
 export interface CreateSectionRequest {
   title: string;
   description?: string;
@@ -74,6 +85,17 @@ export interface VideoUploadResponse {
   message: string;
 }
 
+// New interface for course update with file
+export interface UpdateCourseWithFileRequest {
+  title: string;
+  description: string;
+  price: number;
+  isPublished: boolean;
+  categoryId?: number;
+  thumbnailImageUrl?: string;
+  thumbnailFile?: File;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -98,11 +120,27 @@ export class CourseService {
     return this.http.get<PagedResult<Course>>(url);
   }
 
-  // Create a new course
-  createCourse(courseData: CreateCourseRequest): Observable<CourseCreationResponse> {
+  // Create a new course with optional thumbnail file
+  createCourse(courseData: CreateCourseWithFileRequest): Observable<CourseCreationResponse> {
     const url = `${this.apiUrl}/Courses`;
-    console.log('Creating course:', courseData);
-    return this.http.post<CourseCreationResponse>(url, courseData);
+    
+    // Create FormData for multipart request
+    const formData = new FormData();
+    formData.append('title', courseData.title);
+    formData.append('description', courseData.description);
+    formData.append('price', courseData.price.toString());
+    formData.append('instructorId', courseData.instructorId);
+    
+    if (courseData.categoryId) {
+      formData.append('categoryId', courseData.categoryId.toString());
+    }
+    
+    if (courseData.thumbnailFile) {
+      formData.append('thumbnailFile', courseData.thumbnailFile);
+    }
+
+    console.log('Creating course with FormData:', courseData);
+    return this.http.post<CourseCreationResponse>(url, formData);
   }
 
   // Create a section for a course
@@ -131,6 +169,33 @@ export class CourseService {
     return this.http.put<void>(url, { id, ...courseData });
   }
 
+  // Update course with optional thumbnail file
+  updateCourseWithFile(id: number, courseData: UpdateCourseWithFileRequest): Observable<void> {
+    const url = `${this.apiUrl}/Courses/${id}`;
+    
+    // Create FormData for multipart request
+    const formData = new FormData();
+    formData.append('title', courseData.title);
+    formData.append('description', courseData.description);
+    formData.append('price', courseData.price.toString());
+    formData.append('isPublished', courseData.isPublished.toString());
+    
+    if (courseData.categoryId) {
+      formData.append('categoryId', courseData.categoryId.toString());
+    }
+    
+    if (courseData.thumbnailImageUrl) {
+      formData.append('thumbnailImageUrl', courseData.thumbnailImageUrl);
+    }
+    
+    if (courseData.thumbnailFile) {
+      formData.append('thumbnailFile', courseData.thumbnailFile);
+    }
+
+    console.log('Updating course with FormData:', courseData);
+    return this.http.put<void>(url, formData);
+  }
+
   // Get sections by course ID
   getSectionsByCourse(courseId: number): Observable<SectionResponse[]> {
     const url = `${this.apiUrl}/courses/${courseId}/sections`;
@@ -143,13 +208,6 @@ export class CourseService {
     const url = `${this.apiUrl}/sections/${sectionId}/lectures`;
     console.log('Getting lectures for section:', sectionId);
     return this.http.get<LessonResponse[]>(url);
-  }
-
-  // Upload thumbnail file
-  uploadThumbnail(formData: FormData): Observable<UploadResponse> {
-    const url = `${this.apiUrl}/uploads/thumbnail`;
-    console.log('Uploading thumbnail file');
-    return this.http.post<UploadResponse>(url, formData);
   }
 
   // Upload video for a lecture
