@@ -397,16 +397,88 @@ export class CourseBuilderComponent implements OnInit {
             .updateCourse(this.courseId, courseData)
             .pipe(
                 switchMap(() => {
-                    // For now, we'll just show success message
-                    // In a full implementation, you'd want to handle curriculum updates too
-                    this.snackBar.open('Course updated successfully!', 'Close', {
-                        duration: 3000,
-                    });
-                    this.isLoading = false;
+                    // Now handle curriculum updates
+                    if (!curriculum || curriculum.length === 0) {
+                        return of(null);
+                    }
 
-                    // Navigate back to teacher dashboard
-                    this.router.navigate(['/teacher/dashboard']);
-                    return of(null);
+                    // Process curriculum changes
+                    const updatePromises: Promise<any>[] = [];
+
+                    curriculum.forEach((section, sectionIndex) => {
+                        // Check if section is new (has temporary ID) or existing
+                        const sectionId = section.id;
+                        
+                        if (sectionId.toString().startsWith('id_')) {
+                            // New section - create it
+                            const sectionData: CreateSectionRequest = {
+                                title: section.title,
+                                description: section.description,
+                                order: sectionIndex,
+                            };
+                            
+                            const promise = this.courseService.createSection(this.courseId!, sectionData)
+                                .pipe(
+                                    switchMap((sectionResponse) => {
+                                        // Create lessons for new section
+                                        return this.createLessonsForSection(section.lessons, sectionResponse.id, sectionIndex);
+                                    })
+                                ).toPromise();
+                            
+                            updatePromises.push(promise);
+                        } else {
+                            // Existing section - handle lessons
+                            section.lessons.forEach((lesson: any, lessonIndex: number) => {
+                                const lectureId = lesson.id;
+                                
+                                if (lectureId.toString().startsWith('id_')) {
+                                    // New lesson in existing section
+                                    const lessonData: CreateLessonRequest = {
+                                        title: lesson.title,
+                                        type: lesson.type,
+                                        duration: lesson.duration || 0,
+                                        content: lesson.content,
+                                        videoUrl: '',
+                                        order: lessonIndex,
+                                    };
+                                    
+                                    const promise = this.courseService.createLesson(parseInt(sectionId), lessonData)
+                                        .pipe(
+                                            switchMap((lessonResponse) => {
+                                                // Upload video if present
+                                                const videoFile = lesson.videoFile;
+                                                if (videoFile && lesson.type === 'video') {
+                                                    return this.uploadVideoForLesson(
+                                                        videoFile,
+                                                        lessonResponse.id,
+                                                        sectionIndex,
+                                                        lessonIndex
+                                                    ).then(() => lessonResponse);
+                                                }
+                                                return of(lessonResponse);
+                                            })
+                                        ).toPromise();
+                                    
+                                    updatePromises.push(promise);
+                                } else {
+                                    // Existing lesson - check if video needs upload
+                                    const videoFile = lesson.videoFile;
+                                    if (videoFile && lesson.type === 'video') {
+                                        const promise = this.uploadVideoForLesson(
+                                            videoFile,
+                                            parseInt(lectureId),
+                                            sectionIndex,
+                                            lessonIndex
+                                        );
+                                        updatePromises.push(promise);
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    // Wait for all updates to complete
+                    return Promise.all(updatePromises);
                 }),
                 catchError((error) => {
                     console.error('Error updating course:', error);
@@ -419,7 +491,58 @@ export class CourseBuilderComponent implements OnInit {
                     return of(null);
                 })
             )
-            .subscribe();
+            .subscribe({
+                next: (result) => {
+                    this.snackBar.open('Course updated successfully!', 'Close', {
+                        duration: 3000,
+                    });
+                    this.isLoading = false;
+                    this.router.navigate(['/teacher/dashboard']);
+                },
+                error: (error) => {
+                    console.error('Unexpected error:', error);
+                    this.snackBar.open('An unexpected error occurred', 'Close', {
+                        duration: 5000,
+                    });
+                    this.isLoading = false;
+                }
+            });
+    }
+
+    private async createLessonsForSection(lessons: any[], sectionId: number, sectionIndex: number): Promise<any> {
+        if (!lessons || lessons.length === 0) {
+            return Promise.resolve();
+        }
+
+        const lessonPromises = lessons.map((lesson: any, lessonIndex: number) => {
+            const lessonData: CreateLessonRequest = {
+                title: lesson.title,
+                type: lesson.type,
+                duration: lesson.duration || 0,
+                content: lesson.content,
+                videoUrl: '',
+                order: lessonIndex,
+            };
+
+            return this.courseService.createLesson(sectionId, lessonData)
+                .pipe(
+                    switchMap((lessonResponse) => {
+                        // Upload video if present
+                        const videoFile = lesson.videoFile;
+                        if (videoFile && lesson.type === 'video') {
+                            return this.uploadVideoForLesson(
+                                videoFile,
+                                lessonResponse.id,
+                                sectionIndex,
+                                lessonIndex
+                            ).then(() => lessonResponse);
+                        }
+                        return of(lessonResponse);
+                    })
+                ).toPromise();
+        });
+
+        return Promise.all(lessonPromises);
     }
 
     createCourseWithCurriculum(
@@ -524,47 +647,6 @@ export class CourseBuilderComponent implements OnInit {
                     this.isLoading = false;
                 },
             });
-    }
-
-    createCourse(courseData: CreateCourseRequest): void {
-        this.courseService.createCourse(courseData).subscribe({
-            next: (response) => {
-                console.log('Course created successfully:', response);
-                this.snackBar.open('Course created successfully!', 'Close', {
-                    duration: 3000,
-                });
-                this.router.navigate(['/teacher/courses']);
-            },
-            error: (error: any) => {
-                console.error('Error creating course:', error);
-                this.snackBar.open(
-                    'Failed to create course. Please try again.',
-                    'Close',
-                    { duration: 5000 }
-                );
-            },
-        });
-    }
-
-    updateCourse(courseData: CreateCourseRequest): void {
-        const courseIdNum = parseInt(this.courseId!.toString());
-        this.courseService.updateCourse(courseIdNum, courseData).subscribe({
-            next: () => {
-                console.log('Course updated successfully');
-                this.snackBar.open('Course updated successfully!', 'Close', {
-                    duration: 3000,
-                });
-                this.router.navigate(['/teacher/courses']);
-            },
-            error: (error: any) => {
-                console.error('Error updating course:', error);
-                this.snackBar.open(
-                    'Failed to update course. Please try again.',
-                    'Close',
-                    { duration: 5000 }
-                );
-            },
-        });
     }
 
     onCancel(): void {
@@ -775,6 +857,8 @@ export class CourseBuilderComponent implements OnInit {
                     videoUrl: [lecture.videoUrl || ''],
                     order: [lecture.order || lessonIndex],
                     isUploadingVideo: [false], // Added for video upload status
+                    videoFile: [null], // For storing new video files
+                    videoPreviewUrl: [''], // For storing preview URLs
                 });
 
                 lessonsArray.push(lessonForm);
