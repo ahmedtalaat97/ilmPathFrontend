@@ -48,4 +48,10 @@ export class CartService {
       tap(cart => this.cartSubject.next(cart))
     );
   }
+
+  clearCart() {
+    return this.http.delete<Cart>(`${this.apiUrl}`).pipe(
+      tap(cart => this.cartSubject.next(cart))
+    );
+  }
 } 

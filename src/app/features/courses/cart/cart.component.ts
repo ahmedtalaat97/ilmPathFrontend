@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { StripePaymentService } from '../../../core/services/stripe-payment.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-cart',
@@ -36,6 +38,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class CartComponent implements OnInit {
   private cartService = inject(CartService);
   private snackBar = inject(MatSnackBar);
+  private stripePaymentService = inject(StripePaymentService);
 
   cart: Cart | null = null;
   loading = true;
@@ -74,7 +77,28 @@ export class CartComponent implements OnInit {
     });
   }
 
-  proceedToCheckout() {
-    this.snackBar.open('Checkout is not implemented yet.', 'Close', { duration: 2500, panelClass: 'snackbar-success' });
+  async proceedToCheckout() {
+    if (!this.cart || this.cart.items.length === 0) {
+      this.snackBar.open('Your cart is empty.', 'Close', { duration: 2500, panelClass: 'snackbar-error' });
+      return;
+    }
+    this.loading = true;
+    const successUrl = window.location.origin + '/checkout-success';
+    const cancelUrl = window.location.origin + '/cart';
+    this.stripePaymentService.createCheckoutSession(successUrl, cancelUrl).subscribe({
+      next: async (res) => {
+        // Option 1: Redirect using checkoutUrl
+        window.location.href = res.checkoutUrl;
+        // Option 2: If you want to use Stripe.js, uncomment below:
+        // const stripe = await loadStripe(environment.stripePublishableKey);
+        // if (stripe) {
+        //   stripe.redirectToCheckout({ sessionId: res.sessionId });
+        // }
+      },
+      error: () => {
+        this.snackBar.open('Failed to initiate checkout.', 'Close', { duration: 2500, panelClass: 'snackbar-error' });
+        this.loading = false;
+      }
+    });
   }
 }
