@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -6,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CartService } from '../cart.service';
 import { StripePaymentService } from '../../../core/services/stripe-payment.service';
 import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-checkout-success',
@@ -116,6 +118,7 @@ export class CheckoutSuccessComponent {
         this.error = true;
         this.loading = false;
       }
+
     });
   }
   goToCourses() {
