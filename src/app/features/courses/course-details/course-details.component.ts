@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService, SectionResponse, LessonResponse, CourseCreationResponse } from '../course.service';
+import { EnrollmentService } from '../../enrollment/enrollment.service';
 import { ReactiveFormsModule, FormBuilder, FormControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -50,7 +51,9 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class CourseDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private courseService = inject(CourseService);
+  private enrollmentService = inject(EnrollmentService);
   private fb = inject(FormBuilder);
   private cartService = inject(CartService);
   private snackBar = inject(MatSnackBar);
@@ -61,6 +64,8 @@ export class CourseDetailsComponent implements OnInit {
   totalDuration: number = 0; // in minutes
   loading = true;
   error: string | null = null;
+  isEnrolled = false;
+  checkingEnrollment = false;
 
   couponControl = new FormControl('');
   couponApplied: string | null = null;
@@ -90,6 +95,7 @@ export class CourseDetailsComponent implements OnInit {
     this.courseService.getCourseById(id).subscribe({
       next: (course) => {
         this.course = course;
+        this.checkEnrollmentStatus(id);
         this.courseService.getSectionsByCourse(id).subscribe({
           next: (sections) => {
             this.sections = sections;
@@ -104,6 +110,21 @@ export class CourseDetailsComponent implements OnInit {
       error: (err) => {
         this.error = 'Failed to load course.';
         this.loading = false;
+      }
+    });
+  }
+
+  checkEnrollmentStatus(courseId: number) {
+    this.checkingEnrollment = true;
+    this.enrollmentService.checkEnrollment(courseId).subscribe({
+      next: (enrollmentStatus) => {
+        this.isEnrolled = enrollmentStatus.isEnrolled;
+        this.checkingEnrollment = false;
+      },
+      error: (err) => {
+        console.error('Error checking enrollment:', err);
+        this.isEnrolled = false;
+        this.checkingEnrollment = false;
       }
     });
   }
@@ -156,5 +177,11 @@ export class CourseDetailsComponent implements OnInit {
         this.snackBar.open('Failed to add course to cart.', 'Close', { duration: 2500, panelClass: 'snackbar-error' });
       }
     });
+  }
+
+  startLearning() {
+    if (this.course) {
+      this.router.navigate(['/courses', this.course.id, 'learn']);
+    }
   }
 }
