@@ -96,6 +96,16 @@ export interface UpdateCourseWithFileRequest {
   thumbnailFile?: File;
 }
 
+// Add new interface for regular course update (without file)
+export interface UpdateCourseRequest {
+  title: string;
+  description: string;
+  price: number;
+  isPublished: boolean;
+  categoryId?: number;
+  thumbnailImageUrl?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -164,9 +174,26 @@ export class CourseService {
   }
 
   // Update course
-  updateCourse(id: number, courseData: Partial<CreateCourseRequest>): Observable<void> {
+  updateCourse(id: number, courseData: UpdateCourseRequest): Observable<void> {
     const url = `${this.apiUrl}/Courses/${id}`;
-    return this.http.put<void>(url, { id, ...courseData });
+    
+    // Create FormData since backend expects FormData
+    const formData = new FormData();
+    formData.append('title', courseData.title);
+    formData.append('description', courseData.description);
+    formData.append('price', courseData.price.toString());
+    formData.append('isPublished', courseData.isPublished.toString());
+    
+    if (courseData.categoryId) {
+      formData.append('categoryId', courseData.categoryId.toString());
+    }
+    
+    if (courseData.thumbnailImageUrl) {
+      formData.append('thumbnailImageUrl', courseData.thumbnailImageUrl);
+    }
+
+    console.log('Updating course with FormData:', courseData);
+    return this.http.put<void>(url, formData);
   }
 
   // Update course with optional thumbnail file

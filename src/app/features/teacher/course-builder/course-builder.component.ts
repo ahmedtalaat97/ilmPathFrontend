@@ -31,6 +31,7 @@ import {
     CreateCourseWithFileRequest,
     CreateCourseRequest,
     UpdateCourseWithFileRequest,
+    UpdateCourseRequest,
     CreateSectionRequest,
     CreateLessonRequest,
     CourseCreationResponse,
@@ -123,13 +124,13 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         // Fetch categories first
         this.loadCategories().then(() => {
             // Check if we're in edit mode after categories are loaded
-            this.route.paramMap.subscribe((params) => {
-                const id = params.get('id');
-                if (id) {
-                    this.courseId = parseInt(id, 10);
-                    this.isEditMode = true;
-                    this.loadCourseData();
-                }
+        this.route.paramMap.subscribe((params) => {
+            const id = params.get('id');
+            if (id) {
+                this.courseId = parseInt(id, 10);
+                this.isEditMode = true;
+                this.loadCourseData();
+            }
             });
         });
     }
@@ -404,8 +405,16 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
             };
             updateObservable = this.courseService.updateCourseWithFile(this.courseId, updateDataWithFile);
         } else {
-            // Use the regular JSON version
-            updateObservable = this.courseService.updateCourse(this.courseId, courseData);
+            // Use the regular JSON version with proper structure
+            const updateData: UpdateCourseRequest = {
+                title: formValue.title,
+                description: formValue.description,
+                price: formValue.price,
+                isPublished: formValue.isPublished || false,
+                categoryId: formValue.categoryId,
+                thumbnailImageUrl: formValue.thumbnailImageUrl,
+            };
+            updateObservable = this.courseService.updateCourse(this.courseId, updateData);
         }
 
         // First update the course basic info
@@ -660,8 +669,8 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
                         duration: 5000,
                     });
                     this.isLoading = false;
-                },
-            });
+            },
+        });
     }
 
     onCancel(): void {
@@ -703,11 +712,11 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
             this.thumbnailPreviewUrl = URL.createObjectURL(file); // Set preview URL
 
             // Mark form as dirty
-            this.courseForm.markAsDirty();
+                this.courseForm.markAsDirty();
 
             this.snackBar.open('Thumbnail selected successfully!', 'Close', {
-                duration: 2000,
-            });
+                    duration: 2000,
+                });
         }
     }
 
@@ -868,7 +877,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         let totalDuration = 0;
         this.curriculumArray.controls.forEach((section, sectionIndex) => {
             this.getLessonsArray(sectionIndex).controls.forEach(lesson => {
-                const duration = lesson.get('duration')?.value || 0;
+                    const duration = lesson.get('duration')?.value || 0;
                 totalDuration += parseInt(duration);
             });
         });
@@ -917,7 +926,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
         });
     }
 
-    private formatFileSize(bytes: number): string {
+    public formatFileSize(bytes: number): string {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
