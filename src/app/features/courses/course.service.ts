@@ -73,6 +73,35 @@ export interface LessonResponse {
   isPreviewAllowed: boolean;
 }
 
+// New interfaces for course player
+export interface CourseWithContent {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  isPublished: boolean;
+  thumbnailImageUrl?: string;
+  categoryId?: number;
+  categoryName?: string;
+  instructorId: string;
+  instructorName?: string;
+  totalDurationMinutes: number;
+  totalLecturesCount: number;
+  sectionsCount: number;
+  sections: SectionWithLectures[];
+}
+
+export interface SectionWithLectures {
+  id: number;
+  courseId: number;
+  title: string;
+  description: string;
+  order: number;
+  durationMinutes: number;
+  lecturesCount: number;
+  lectures: LessonResponse[];
+}
+
 export interface UploadResponse {
   url: string;
   fileName: string;
@@ -171,6 +200,13 @@ export class CourseService {
   getCourseById(id: number): Observable<CourseCreationResponse> {
     const url = `${this.apiUrl}/Courses/${id}`;
     return this.http.get<CourseCreationResponse>(url);
+  }
+
+  // Get course with all content for learning (NEW METHOD)
+  getCourseWithContent(id: number): Observable<CourseWithContent> {
+    const url = `${this.apiUrl}/Courses/${id}/learn`;
+    console.log('Getting course with content for learning:', id);
+    return this.http.get<CourseWithContent>(url);
   }
 
   // Update course
