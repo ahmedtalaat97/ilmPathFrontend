@@ -307,6 +307,7 @@ mat-panel-description {
 }
 
 .start-learning-btn {
+  margin-top: 18px;
   padding: 12px 24px;
   font-size: 16px;
   font-weight: 500;

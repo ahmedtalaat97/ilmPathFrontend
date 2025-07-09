@@ -1,0 +1,19 @@
+<div class="my-courses-container">
+  <h2>My Learning</h2>
+  <ng-container *ngIf="loading">Loading your enrollments...</ng-container>
+  <ng-container *ngIf="error">Failed to load enrollments.</ng-container>
+  <ng-container *ngIf="!loading && !error && courseCards.length === 0">
+    <p>You are not enrolled in any courses yet.</p>
+  </ng-container>
+  <div class="courses-grid" *ngIf="!loading && !error && courseCards.length > 0">
+    <div class="course-card" *ngFor="let card of courseCards" (click)="goToLearn(card.course.id)">
+      <img [src]="card.course.thumbnailImageUrl || 'https://placehold.co/300x180?text=Course'" [alt]="card.course.title">
+      <div class="course-info">
+        <h3>{{ card.course.title }}</h3>
+        <p class="instructor">Instructor: {{ card.course.instructorName || 'Unknown' }}</p>
+        <p class="enrolled-date">Enrolled: {{ card.enrollment.enrollmentDate|date:'mediumDate' }}</p>
+        <button class="learn-btn" (click)="goToLearn(card.course.id)">Start Learning</button>
+      </div>
+    </div>
+  </div>
+</div> 

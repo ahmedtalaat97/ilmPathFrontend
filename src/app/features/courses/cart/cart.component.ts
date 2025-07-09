@@ -88,6 +88,9 @@ export class CartComponent implements OnInit {
     this.stripePaymentService.createCheckoutSession(successUrl, cancelUrl).subscribe({
       next: async (res) => {
         // Option 1: Redirect using checkoutUrl
+
+console.log(res.sessionId);
+
         window.location.href = res.checkoutUrl;
         // Option 2: If you want to use Stripe.js, uncomment below:
         // const stripe = await loadStripe(environment.stripePublishableKey);

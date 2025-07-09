@@ -59,6 +59,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/ai-chat/ai-chat.component').then(c => c.AiChatComponent)
    
   },
+  { 
+    path: 'my-courses', 
+    loadComponent: () => import('./features/courses/my-courses/my-courses.component').then(c => c.MyCoursesComponent),
+    canActivate: [AuthGuard]
+  },
   { path: '', redirectTo: 'courses', pathMatch: 'full' },
   { path: '**', redirectTo: 'courses' } // Wildcard route for 404 pages
 ]; 

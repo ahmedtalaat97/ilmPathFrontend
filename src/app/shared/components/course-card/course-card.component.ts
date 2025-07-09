@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Course } from '../../models/course.model';
 import { MatCardModule } from '@angular/material/card';
@@ -27,6 +27,9 @@ export class CourseCardComponent {
   isBestseller = Math.random() > 0.7; 
 
   @Input({ required: true }) course!: Course;
+  @Input() enrolled: boolean = false;
+  @Input() showStartLearningBtn: boolean = false;
+  @Output() startLearning = new EventEmitter<string | number>();
 
   constructor(private router: Router, private cartService: CartService, private snackBar: MatSnackBar) {}
 
@@ -44,5 +47,10 @@ export class CourseCardComponent {
         this.snackBar.open('Failed to add course to cart.', 'Close', { duration: 2500, panelClass: 'snackbar-error' });
       }
     });
+  }
+
+  onStartLearning(event: Event) {
+    event.stopPropagation();
+    this.router.navigate([`/courses/${this.course.id}/learn`]);
   }
 }

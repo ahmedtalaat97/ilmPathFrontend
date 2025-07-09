@@ -1,9 +1,13 @@
+import { Component, inject } from '@angular/core';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { CartService } from '../cart.service';
+import { StripePaymentService } from '../../../core/services/stripe-payment.service';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-checkout-success',
@@ -86,11 +90,35 @@ import { CartService } from '../cart.service';
 export class CheckoutSuccessComponent {
   loading = true;
   error = false;
-  constructor(private router: Router, private cartService: CartService) {}
+  private cartService = inject(CartService);
+  private stripePaymentService = inject(StripePaymentService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   ngOnInit() {
-    this.cartService.clearCart().subscribe({
-      next: () => { this.loading = false; },
-      error: () => { this.loading = false; this.error = true; }
+    const sessionId = this.route.snapshot.queryParamMap.get('session_id');
+    console.log('Session ID:', sessionId);
+    if (!sessionId) {
+      this.error = true;
+      this.loading = false;
+      return;
+    }
+    this.stripePaymentService.verifyPayment(sessionId).subscribe({
+      next: (res) => {
+        console.log('Verification response:', res);
+        if (res.success) {
+          this.cartService.initCart(); // Refresh cart count in navbar
+          this.loading = false;
+        } else {
+          this.error = true;
+          this.loading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Verification error:', err);
+        this.error = true;
+        this.loading = false;
+      }
+
     });
   }
   goToCourses() {

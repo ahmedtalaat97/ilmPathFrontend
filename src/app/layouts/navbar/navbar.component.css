@@ -2,14 +2,14 @@
    MODERN NAVBAR VARIABLES
    ====================== */
 :host {
-  --navbar-bg: linear-gradient(135deg, rgba(33, 150, 243, 0.95) 0%, rgba(25, 118, 210, 0.98) 100%);
+  --navbar-bg: #7b1fa2;
   --navbar-glass: rgba(255, 255, 255, 0.1);
   --navbar-border: rgba(255, 255, 255, 0.2);
   --navbar-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.8);
-  --accent-green: #00e676;
-  --accent-orange: #ff6d00;
+  --accent-green: #e040fb;
+  --accent-orange: #7b1fa2;
   --hover-bg: rgba(255, 255, 255, 0.1);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -225,19 +225,27 @@
 /* ======================
    BADGE STYLING
    ====================== */
-.cart-btn .mat-badge-content {
-  background: linear-gradient(135deg, var(--accent-green), #00c853) !important;
-  color: #000000 !important;
-  font-size: 12px !important;
+:host ::ng-deep .cart-btn .mat-badge-content {
+  background: #fff !important;
+  color: #7b1fa2 !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
-  min-width: 22px !important;
-  height: 22px !important;
-  line-height: 22px !important;
-  border-radius: 11px !important;
-  top: 8px !important;
-  right: 8px !important;
-  box-shadow: 0 2px 8px rgba(0, 230, 118, 0.4) !important;
-  animation: pulse-badge 2s infinite !important;
+  min-width: 26px !important;
+  height: 26px !important;
+  line-height: 26px !important;
+  border-radius: 13px !important;
+  top: 2px !important;
+  right: 2px !important;
+  border: 2px solid #7b1fa2 !important;
+  box-shadow: 0 2px 8px rgba(123, 31, 162, 0.15) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+:host ::ng-deep .cart-btn:hover .mat-badge-content {
+  box-shadow: 0 4px 16px #7b1fa2 !important;
 }
 
 @keyframes pulse-badge {
@@ -363,30 +371,54 @@
 
 @media (max-width: 480px) {
   .navbar {
-    padding: 0 12px;
+    padding: 0 4px;
+    height: 56px;
   }
-  
   .logo span {
     display: none;
   }
-  
   .logo {
-    padding: 4px 8px;
+    padding: 2px 4px;
     gap: 0;
   }
-  
+  .nav-links {
+    gap: 0;
+  }
   .nav-links a span,
   .nav-links button span {
     display: none;
   }
-  
+  .nav-links a,
+  .nav-links button {
+    padding: 0 6px !important;
+    min-width: 36px;
+    font-size: 0 !important;
+  }
   .nav-links mat-icon {
     margin-right: 0 !important;
+    font-size: 22px !important;
   }
-  
-  .user-actions a[routerLink="/register"] {
-    padding: 8px 16px !important;
-    font-size: 14px !important;
+  .user-actions {
+    gap: 2px;
+  }
+  .user-name {
+    display: none;
+  }
+  .cart-btn,
+  .chat-btn,
+  .user-menu-button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+  }
+  :host ::ng-deep .cart-btn .mat-badge-content {
+    min-width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    font-size: 12px !important;
+    top: 0 !important;
+    right: 0 !important;
   }
 }
 
@@ -408,4 +440,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.cart-btn {
+  width: 56px !important;
+  height: 56px !important;
+  overflow: visible !important;
+  position: relative !important;
 }
