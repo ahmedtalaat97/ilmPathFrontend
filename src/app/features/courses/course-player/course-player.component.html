@@ -1,0 +1,182 @@
+<!-- Loading State -->
+@if (loading) {
+  <div class="loading-container d-flex flex-column align-items-center justify-content-center vh-100 gap-4">
+    <div class="spinner"></div>
+    <mat-progress-bar mode="indeterminate" class="progress-bar"></mat-progress-bar>
+    <p class="loading-text fs-5 text-center">Loading course content...</p>
+  </div>
+}
+
+<!-- Error State -->
+@if (error) {
+  <div class="error-container d-flex align-items-center justify-content-center vh-100 p-4">
+    <mat-card class="error-card text-center" style="max-width: 500px;">
+      <mat-card-content>
+        <div class="error-content d-flex flex-column align-items-center gap-4 p-4">
+          <mat-icon class="error-icon">error</mat-icon>
+          <h3 class="error-title mb-3">{{ error }}</h3>
+          <button mat-raised-button color="primary" (click)="backToCourse()" class="error-button px-4">
+            <mat-icon class="me-2">arrow_back</mat-icon>
+            Back to Course
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
+
+<!-- Course Player -->
+@if (!loading && !error && course) {
+  <div class="course-player-container d-flex flex-column vh-100">
+    
+    <!-- Top Toolbar -->
+    <mat-toolbar color="primary" class="course-toolbar flex-shrink-0">
+      <button mat-icon-button (click)="toggleSidenav()" class="me-3">
+        <mat-icon>menu</mat-icon>
+      </button>
+      
+      <span class="course-title fs-5 fw-semibold flex-fill text-truncate me-3">{{ course.title }}</span>
+      
+      <button mat-button (click)="backToCourse()" class="back-button d-flex align-items-center gap-2">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Back to Course</span>
+      </button>
+    </mat-toolbar>
+
+    <!-- Main Content Area -->
+    <mat-sidenav-container class="sidenav-container flex-fill">
+      
+      <!-- Sidebar with Course Navigation -->
+      <mat-sidenav 
+        #sidenav 
+        [opened]="sidenavOpened" 
+        mode="side" 
+        position="end"
+        class="course-sidebar">
+        
+        <div class="sidebar-header p-4 border-bottom">
+          <div class="sidebar-title d-flex align-items-center gap-3 mb-3">
+            <mat-icon class="sidebar-icon fs-4">library_books</mat-icon>
+            <h3 class="h5 mb-0 fw-bold">Course Content</h3>
+          </div>
+          <div class="course-stats d-flex flex-wrap gap-2">
+            <span class="stat-badge sections badge rounded-pill">{{ course.sectionsCount }} sections</span>
+            <span class="stat-badge lectures badge rounded-pill">{{ course.totalLecturesCount }} lectures</span>
+            <span class="stat-badge duration badge rounded-pill">{{ course.totalDurationMinutes }} min</span>
+          </div>
+        </div>
+
+        <div class="course-sections p-3">
+          @for (section of course.sections; track section.id; let sectionIndex = $index) {
+            <mat-expansion-panel 
+              [expanded]="sectionIndex === currentSectionIndex" 
+              class="section-panel mb-3">
+              
+              <mat-expansion-panel-header class="section-header">
+                <mat-panel-title class="section-title fw-semibold">
+                  <div class="d-flex align-items-center gap-2 w-100">
+                    <span class="section-number badge bg-primary rounded-pill px-2">{{ sectionIndex + 1 }}</span>
+                    <span class="flex-fill" [matTooltip]="section.title" matTooltipPosition="above">{{ section.title }}</span>
+                  </div>
+                </mat-panel-title>
+                <mat-panel-description class="section-description text-muted">
+                  {{ section.lecturesCount }} lectures • {{ section.durationMinutes }} min
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="lectures-container p-2">
+                @for (lecture of section.lectures; track lecture.id; let lectureIndex = $index) {
+                  <div 
+                    class="lecture-item d-flex align-items-center p-3 my-1 rounded cursor-pointer"
+                    [class.current-lecture]="sectionIndex === currentSectionIndex && lectureIndex === currentLectureIndex"
+                    (click)="selectLecture(sectionIndex, lectureIndex)">
+                    
+                    <mat-icon class="lecture-icon me-3 fs-4">
+                      {{ (sectionIndex === currentSectionIndex && lectureIndex === currentLectureIndex) ? 'play_circle_filled' : 'play_circle_outline' }}
+                    </mat-icon>
+                    
+                    <div class="lecture-info flex-fill">
+                      <div class="lecture-title fw-medium mb-1">{{ lecture.title }}</div>
+                      <div class="lecture-duration d-flex align-items-center text-muted small gap-1">
+                        <mat-icon class="duration-icon" style="font-size: 16px;">schedule</mat-icon>
+                        {{ lecture.durationInMinutes || 0 }} min
+                      </div>
+                    </div>
+
+                    @if (sectionIndex === currentSectionIndex && lectureIndex === currentLectureIndex) {
+                      <mat-icon class="playing-icon ms-3 fs-5">volume_up</mat-icon>
+                    }
+                  </div>
+                }
+              </div>
+
+            </mat-expansion-panel>
+          }
+        </div>
+      </mat-sidenav>
+
+      <!-- Main Video Area -->
+      <mat-sidenav-content class="video-content d-flex flex-column">
+        
+        <!-- Current Lecture Info -->
+        @if (currentLecture) {
+          <div class="lecture-header d-flex justify-content-between align-items-center p-4 border-bottom">
+            <div class="lecture-details flex-fill">
+              <h2 class="current-lecture-title h4 fw-bold mb-2">{{ currentLecture.title }}</h2>
+              <p class="current-section-info d-flex align-items-center text-muted mb-0 gap-2">
+                <mat-icon style="font-size: 18px;">folder</mat-icon>
+                Section {{ currentSectionIndex + 1 }}: {{ course.sections[currentSectionIndex].title }}
+              </p>
+            </div>
+            <div class="progress-info text-end">
+              <div class="progress-label text-muted small">Progress</div>
+              <div class="progress-value text-primary fs-5 fw-bold">{{ currentLectureIndex + 1 }} / {{ (course && course.sections && course.sections[currentSectionIndex]) ? course.sections[currentSectionIndex].lectures.length : 0 }}</div>
+            </div>
+          </div>
+        }
+
+        <!-- Video Player -->
+        @if (currentLecture) {
+          <div class="video-container flex-fill d-flex align-items-center justify-content-center p-5">
+            <video 
+              #videoPlayer
+              class="video-player w-100 h-100 rounded shadow-lg"
+              [src]="currentLecture.videoUrl"
+              controls
+              controlsList="nodownload"
+              disablePictureInPicture>
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        }
+
+        <!-- Navigation Controls -->
+        <div class="lecture-controls d-flex justify-content-between align-items-center p-4 border-top">
+          <button 
+            mat-raised-button 
+            [disabled]="!canGoPrevious()"
+            (click)="goToPreviousLecture()"
+            class="control-button prev-button d-flex align-items-center gap-2">
+            <mat-icon>skip_previous</mat-icon>
+            <span>Previous Lecture</span>
+          </button>
+
+          <div class="control-info d-flex align-items-center">
+            <span class="control-text text-muted small">{{ currentLectureIndex + 1 }} of {{ (course && course.sections && course.sections[currentSectionIndex]) ? course.sections[currentSectionIndex].lectures.length : 0 }} in this section</span>
+          </div>
+
+          <button 
+            mat-raised-button 
+            color="primary"
+            [disabled]="!canGoNext()"
+            (click)="goToNextLecture()"
+            class="control-button next-button d-flex align-items-center gap-2">
+            <span>Next Lecture</span>
+            <mat-icon>skip_next</mat-icon>
+          </button>
+        </div>
+
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+} 

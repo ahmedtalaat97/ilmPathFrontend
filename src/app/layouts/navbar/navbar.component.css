@@ -1,112 +1,411 @@
+/* ======================
+   MODERN NAVBAR VARIABLES
+   ====================== */
+:host {
+  --navbar-bg: linear-gradient(135deg, rgba(33, 150, 243, 0.95) 0%, rgba(25, 118, 210, 0.98) 100%);
+  --navbar-glass: rgba(255, 255, 255, 0.1);
+  --navbar-border: rgba(255, 255, 255, 0.2);
+  --navbar-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --accent-green: #00e676;
+  --accent-orange: #ff6d00;
+  --hover-bg: rgba(255, 255, 255, 0.1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ======================
+   MAIN NAVBAR CONTAINER
+   ====================== */
 .navbar {
-    /* This ensures all items are vertically centered and have space between them */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 24px; /* Adds some padding on the left and right */
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Adds space between the icon and text */
-    text-decoration: none;
-    color: white;
-    font-size: 1.25rem;
-    font-weight: 500;
+  background: var(--navbar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--navbar-border);
+  box-shadow: var(--navbar-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  height: 72px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: var(--transition-smooth);
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--navbar-glass);
+  border-radius: 0;
+  pointer-events: none;
+}
+
+/* ======================
+   LOGO STYLING
+   ====================== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  position: relative;
+  z-index: 1;
+  transition: var(--transition-smooth);
+  padding: 8px 16px;
+  border-radius: 16px;
+}
+
+.logo:hover {
+  transform: translateY(-1px);
+  background: var(--hover-bg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.logo mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo span {
+  background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.9));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ======================
+   NAVIGATION LINKS
+   ====================== */
+.nav-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-links a,
+.nav-links button {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  padding: 12px 20px !important;
+  border-radius: 12px !important;
+  transition: var(--transition-smooth) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid transparent !important;
+}
+
+.nav-links a::before,
+.nav-links button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s ease;
+}
+
+.nav-links a:hover,
+.nav-links button:hover {
+  background: var(--hover-bg) !important;
+  border-color: var(--navbar-border) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.nav-links a:hover::before,
+.nav-links button:hover::before {
+  left: 100%;
+}
+
+.nav-links mat-icon {
+  margin-right: 8px !important;
+  font-size: 18px !important;
+}
+
+/* ======================
+   SPACER
+   ====================== */
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* ======================
+   USER ACTIONS
+   ====================== */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Auth Buttons (Login/Register) */
+.user-actions a[routerLink="/login"] {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  padding: 10px 20px !important;
+  border-radius: 10px !important;
+  transition: var(--transition-smooth) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.user-actions a[routerLink="/login"]:hover {
+  background: var(--hover-bg) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.user-actions a[routerLink="/register"] {
+  background: linear-gradient(135deg, var(--accent-green), #00c853) !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  padding: 12px 24px !important;
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3) !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.user-actions a[routerLink="/register"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4) !important;
+  background: linear-gradient(135deg, #00e676, #00e676) !important;
+}
+
+/* Icon Buttons */
+.cart-btn,
+.chat-btn,
+.user-menu-button {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  background: var(--hover-bg) !important;
+  border: 1px solid var(--navbar-border) !important;
+  transition: var(--transition-smooth) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.cart-btn:hover,
+.chat-btn:hover,
+.user-menu-button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.cart-btn mat-icon,
+.chat-btn mat-icon,
+.user-menu-button mat-icon {
+  color: var(--text-primary) !important;
+  font-size: 24px !important;
+}
+
+/* ======================
+   BADGE STYLING
+   ====================== */
+.cart-btn .mat-badge-content {
+  background: linear-gradient(135deg, var(--accent-green), #00c853) !important;
+  color: #000000 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  line-height: 22px !important;
+  border-radius: 11px !important;
+  top: 8px !important;
+  right: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 230, 118, 0.4) !important;
+  animation: pulse-badge 2s infinite !important;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ======================
+   USER NAME
+   ====================== */
+.user-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 12px;
+  padding: 8px 12px;
+  background: var(--hover-bg);
+  border-radius: 8px;
+  border: 1px solid var(--navbar-border);
+  transition: var(--transition-smooth);
+}
+
+/* ======================
+   MENU STYLING
+   ====================== */
+.user-info {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  min-width: 240px;
+}
+
+.user-name-menu {
+  font-weight: 600;
+  font-size: 18px;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+  letter-spacing: -0.025em;
+}
+
+.user-email {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Menu Items */
+.mat-mdc-menu-panel {
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.mat-mdc-menu-item {
+  font-size: 15px !important;
+  padding: 12px 20px !important;
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+  transition: var(--transition-smooth) !important;
+}
+
+.mat-mdc-menu-item:hover {
+  background: rgba(33, 150, 243, 0.08) !important;
+  transform: translateX(4px) !important;
+}
+
+.mat-mdc-menu-item mat-icon {
+  margin-right: 12px !important;
+  color: #6b7280 !important;
+  font-size: 20px !important;
+}
+
+/* ======================
+   RESPONSIVE DESIGN
+   ====================== */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 24px;
   }
   
   .nav-links {
-    display: flex;
-    gap: 8px; /* Adds space between the nav links */
-  }
-  
-  .spacer {
-    /* This flexible space element pushes the items to the sides */
-    flex: 1 1 auto;
+    gap: 4px;
   }
   
   .user-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px; /* Adds space between the action buttons */
+    gap: 12px;
   }
+}
 
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 64px;
+  }
+  
   .user-name {
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-    margin-left: 8px;
+    display: none;
   }
-
+  
+  .nav-links {
+    gap: 2px;
+  }
+  
+  .nav-links a,
+  .nav-links button {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+  }
+  
+  .user-actions {
+    gap: 8px;
+  }
+  
+  .cart-btn,
+  .chat-btn,
   .user-menu-button {
-    margin-right: 4px;
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 12px;
   }
   
-  /* User menu styles */
-  .user-info {
-    padding: 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    min-width: 200px;
-  }
-
-  .user-name-menu {
-    font-weight: 500;
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 4px;
-  }
-
-  .user-email {
-    font-size: 14px;
-    color: #666;
+  .logo span {
+    display: none;
   }
   
-  /* This makes the "Sign Up" button's border white, which looks better on a dark background */
-  .mat-stroked-button, .mat-raised-button {
-    border-color: rgba(255, 255, 255, 0.7) !important;
+  .logo {
+    padding: 4px 8px;
+    gap: 0;
   }
+  
+  .nav-links a span,
+  .nav-links button span {
+    display: none;
+  }
+  
+  .nav-links mat-icon {
+    margin-right: 0 !important;
+  }
+  
+  .user-actions a[routerLink="/register"] {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+  }
+}
 
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .navbar {
-      padding: 0 16px;
-    }
-    
-    .user-name {
-      display: none; /* Hide user name on mobile to save space */
-    }
-    
-    .nav-links {
-      gap: 4px;
-    }
-    
-    .user-actions {
-      gap: 8px;
-    }
-  }
+/* ======================
+   ACCESSIBILITY & FOCUS
+   ====================== */
+.navbar button:focus,
+.navbar a:focus {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 2px;
+}
 
-  @media (max-width: 480px) {
-    .logo span {
-      display: none; /* Hide logo text on very small screens */
-    }
-    
-    .nav-links a {
-      padding: 0 8px;
-      font-size: 14px;
-    }
+/* ======================
+   SMOOTH ANIMATIONS
+   ====================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-
-  .cart-btn .mat-badge-content {
-    font-size: 0.95rem;
-    min-width: 20px;
-    height: 20px;
-    line-height: 20px;
-    padding: 0 4px;
-    top: 50% !important;
-    right: 8px !important;
-    background: #43e6a6 !important;
-    color: #222 !important;
-    font-weight: 700;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  }
+}

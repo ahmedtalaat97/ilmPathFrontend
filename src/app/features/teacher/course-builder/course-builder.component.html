@@ -67,10 +67,15 @@
               <mat-form-field appearance="outline" class="half-width">
                 <mat-label>Category</mat-label>
                 <mat-select formControlName="categoryId">
-                  @for (category of categories; track category.id) {
-                    <mat-option [value]="category.id">
-                      {{ category.name }}
-                    </mat-option>
+                  @if (categories.length === 0) {
+                    <mat-option disabled>Loading categories...</mat-option>
+                  } @else {
+                    <mat-option value="">Select a category</mat-option>
+                    @for (category of categories; track category.id) {
+                      <mat-option [value]="category.id">
+                        {{ category.name }}
+                      </mat-option>
+                    }
                   }
                 </mat-select>
                 @if (courseForm.get('categoryId')?.hasError('required')) {
@@ -84,16 +89,35 @@
               <h3>Course Thumbnail</h3>
               <div class="thumbnail-upload">
                 <div class="thumbnail-preview">
-                  <img [src]="courseForm.get('thumbnailImageUrl')?.value || 'https://placehold.co/300x200?text=Upload+Thumbnail'" 
-                       alt="Course thumbnail">
+                  <img [src]="getThumbnailUrl()" 
+                       alt="Course thumbnail"
+                       class="thumbnail-image">
+                  @if (thumbnailFile || (courseForm.get('thumbnailImageUrl')?.value && courseForm.get('thumbnailImageUrl')?.value !== '')) {
+                    <div class="thumbnail-overlay">
+                      <button mat-icon-button class="remove-thumbnail" 
+                              (click)="clearThumbnail()"
+                              matTooltip="Remove thumbnail">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  }
                 </div>
                 <div class="upload-controls">
                   <input #fileInput type="file" accept="image/*" (change)="onThumbnailSelected($event)" hidden>
-                  <button mat-raised-button (click)="fileInput.click()" type="button">
+                  <button mat-raised-button color="primary" (click)="fileInput.click()" type="button">
                     <mat-icon>cloud_upload</mat-icon>
-                    Upload Thumbnail
+                    {{ thumbnailFile || courseForm.get('thumbnailImageUrl')?.value ? 'Change' : 'Upload' }} Thumbnail
                   </button>
-                  <p class="upload-hint">Recommended size: 750x422 pixels (16:9 ratio)</p>
+                  <div class="upload-info">
+                    <p class="upload-hint">Recommended size: 750x422 pixels (16:9 ratio)</p>
+                    <p class="upload-hint">Supported formats: JPG, PNG, WebP (max 5MB)</p>
+                    @if (thumbnailFile) {
+                      <p class="upload-status">
+                        <mat-icon color="primary">attach_file</mat-icon>
+                        File selected: {{ thumbnailFile.name }} ({{ formatFileSize(thumbnailFile.size) }})
+                      </p>
+                    }
+                  </div>
                 </div>
               </div>
             </div>
@@ -276,10 +300,68 @@
 
                                         <!-- Conditional fields based on lesson type -->
                                         @if (getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value === 'video') {
-                                          <mat-form-field appearance="outline" class="full-width">
-                                            <mat-label>Video URL</mat-label>
-                                            <input matInput formControlName="videoUrl" placeholder="https://...">
-                                          </mat-form-field>
+                                          <div class="video-upload-section">
+                                            <!-- Hidden file input -->
+                                            <input 
+                                              #videoFileInput 
+                                              type="file" 
+                                              accept="video/*" 
+                                              (change)="onVideoFileSelected($event, sectionIndex, lessonIndex)"
+                                              style="display: none">
+
+                                            <!-- Video URL field -->
+                                            <mat-form-field appearance="outline" class="full-width">
+                                              <mat-label>Video URL</mat-label>
+                                              <input matInput formControlName="videoUrl" placeholder="Upload video or enter URL" readonly>
+                                              
+                                              <!-- Upload button inside input -->
+                                              <button 
+                                                mat-icon-button 
+                                                matSuffix 
+                                                type="button"
+                                                (click)="videoFileInput.click()"
+                                                [disabled]="isVideoUploading(sectionIndex, lessonIndex)"
+                                                matTooltip="Upload video file">
+                                                <mat-icon>cloud_upload</mat-icon>
+                                              </button>
+
+                                              <!-- Clear button (only show if video file is selected) -->
+                                              @if (hasVideoFile(sectionIndex, lessonIndex)) {
+                                                <button 
+                                                  mat-icon-button 
+                                                  matSuffix 
+                                                  type="button"
+                                                  (click)="clearVideoFile(sectionIndex, lessonIndex)"
+                                                  matTooltip="Remove video file">
+                                                  <mat-icon>clear</mat-icon>
+                                                </button>
+                                              }
+                                            </mat-form-field>
+
+                                            <!-- Upload progress -->
+                                            @if (isVideoUploading(sectionIndex, lessonIndex)) {
+                                              <div class="upload-progress">
+                                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                                                <p class="upload-status">Uploading video... This may take a few minutes.</p>
+                                              </div>
+                                            }
+
+                                            <!-- Upload success indicator -->
+                                            @if (hasVideoFile(sectionIndex, lessonIndex) && !isVideoUploading(sectionIndex, lessonIndex)) {
+                                              <div class="upload-success">
+                                                <mat-icon color="primary">attach_file</mat-icon>
+                                                <span>Video file selected - will upload when course is created</span>
+                                              </div>
+                                            }
+
+                                            <!-- Server upload success indicator -->
+                                            @if (hasVideoUrl(sectionIndex, lessonIndex) && !isVideoUploading(sectionIndex, lessonIndex)) {
+                                              <div class="upload-success">
+                                                <mat-icon color="primary">check_circle</mat-icon>
+                                                <span>Video uploaded successfully!</span>
+                                              </div>
+                                            }
+                                          </div>
                                         }
 
                                         @if (getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value === 'text' || 
