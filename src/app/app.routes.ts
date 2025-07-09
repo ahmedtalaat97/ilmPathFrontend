@@ -46,6 +46,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   { 
+    path: 'checkout-success',
+    loadComponent: () => import('./features/courses/cart/checkout-success.component').then(m => m.CheckoutSuccessComponent)
+  },
+  { 
     path: 'chat', 
     loadComponent: () => import('./features/ai-chat/ai-chat.component').then(c => c.AiChatComponent)
    
