@@ -86,6 +86,7 @@ export class CoursePlayerComponent implements OnInit {
 
   ngOnInit() {
     const courseId = this.route.snapshot.paramMap.get('id');
+    console.log(courseId);
     if (courseId) {
       this.checkEnrollmentAndLoadCourse(+courseId);
     }
@@ -176,6 +177,7 @@ export class CoursePlayerComponent implements OnInit {
   }
 
   backToCourse() {
+    console.log(this.course?.id);
     this.router.navigate(['/courses', this.course?.id]);
   }
 } 

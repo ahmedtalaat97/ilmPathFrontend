@@ -15,7 +15,7 @@
     <app-loader *ngIf="loading"></app-loader>
     <ng-container *ngIf="!loading">
       <div class="course-grid" *ngIf="courses.length > 0; else noCourses">
-        <app-course-card *ngFor="let course of courses" [course]="course"></app-course-card>
+        <app-course-card *ngFor="let course of courses" [course]="course" [enrolled]="isUserEnrolled(course.id)"></app-course-card>
       </div>
       <mat-paginator
         style="margin-top: 32px;"

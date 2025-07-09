@@ -10,6 +10,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { EnrollmentService } from '../../enrollment/enrollment.service';
 
 @Component({
   selector: 'app-course-list',
@@ -42,7 +43,8 @@ export class CourseListComponent implements OnInit {
   constructor(
     private courseService: CourseService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private enrollmentService: EnrollmentService
   ) {
     console.log('CourseListComponent initialized');
   }
@@ -53,9 +55,17 @@ export class CourseListComponent implements OnInit {
   pageSize = 8;
   totalCourses = 0;
   selectedCategoryId: number | null = null;
+  enrolledCourseIds = new Set<number | string>();
   
   ngOnInit(): void {
     console.log('CourseListComponent ngOnInit called');
+    this.enrollmentService.getMyEnrollments().subscribe({
+      next: (res) => {
+        for (const enrollment of res.items || []) {
+          this.enrolledCourseIds.add(enrollment.courseId);
+        }
+      }
+    });
     
     // Subscribe to query parameters for category filtering
     this.route.queryParams.subscribe(params => {
@@ -90,5 +100,9 @@ export class CourseListComponent implements OnInit {
 
   clearCategoryFilter() {
     this.router.navigate(['/courses']);
+  }
+
+  isUserEnrolled(courseId: number | string): boolean {
+    return this.enrolledCourseIds.has(courseId);
   }
 }   

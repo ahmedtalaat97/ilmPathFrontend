@@ -18,4 +18,10 @@ export class EnrollmentService {
   checkEnrollment(courseId: number): Observable<EnrollmentCheckResponse> {
     return this.http.get<EnrollmentCheckResponse>(`${this.apiUrl}/enrollments/check/${courseId}`);
   }
+
+  getMyEnrollments(pageNumber: number = 1, pageSize: number = 10) {
+    return this.http.get<any>(`${this.apiUrl}/enrollments`, {
+      params: { PageNumber: pageNumber, PageSize: pageSize }
+    });
+  }
 } 

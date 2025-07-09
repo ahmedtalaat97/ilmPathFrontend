@@ -14,12 +14,15 @@
     </mat-card-content>
   
     <mat-card-actions class="card-actions-wrapper">
-      <p class="card-price">${{ course.price }}</p>
-      <div class="buttons">
+      <p class="card-price" *ngIf="!enrolled">${{ course.price }}</p>
+      <div class="buttons" *ngIf="!enrolled">
         <button mat-icon-button color="accent" aria-label="Add to wishlist">
           <mat-icon>favorite_border</mat-icon>
         </button>
         <button mat-flat-button color="primary" (click)="addToCart($event)">Add to Cart</button>
+      </div>
+      <div class="buttons" *ngIf="enrolled">
+        <button mat-flat-button color="primary" (click)="onStartLearning($event)">Start Learning</button>
       </div>
     </mat-card-actions>
   </mat-card>
