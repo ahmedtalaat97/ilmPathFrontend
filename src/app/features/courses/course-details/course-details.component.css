@@ -296,3 +296,38 @@ mat-panel-description {
   color: #b0b0b0;
   white-space: nowrap;
 }
+
+/* Enrolled User Styles */
+.enrolled-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.start-learning-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.start-learning-btn mat-icon {
+  margin-right: 8px;
+}
+
+.enrollment-loading {
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Mobile specific */
+@media (max-width: 768px) {
+  .enrolled-actions {
+    margin-bottom: 16px;
+  }
+  
+  .start-learning-btn {
+    width: 100%;
+  }
+}

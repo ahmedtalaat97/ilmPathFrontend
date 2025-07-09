@@ -1,19 +1,25 @@
-<mat-toolbar color="primary" class="navbar">
+<mat-toolbar class="navbar">
     <a routerLink="/" class="logo">
       <mat-icon>school</mat-icon>
       <span>IlmPath</span>
     </a>
   
     <div class="nav-links">
-      <a mat-button routerLink="/courses">Courses</a>
+      <a mat-button routerLink="/courses">
+        <mat-icon>explore</mat-icon>
+        <span>Courses</span>
+      </a>
       
       <!-- Teacher Dashboard Link - Show for teachers -->
       <a mat-button routerLink="/teacher" *ngIf="isLoggedIn">
         <mat-icon>dashboard</mat-icon>
-        Teach
+        <span>Teach</span>
       </a>
       
-      <button mat-button [matMenuTriggerFor]="categoriesMenu">Categories</button>
+      <button mat-button [matMenuTriggerFor]="categoriesMenu">
+        <mat-icon>category</mat-icon>
+        <span>Categories</span>
+      </button>
     </div>
   
     <div class="spacer"></div>
@@ -21,19 +27,19 @@
     <!-- Show when NOT logged in -->
     <div class="user-actions" *ngIf="!isLoggedIn">
       <a mat-button routerLink="/login">Log In</a>
-      <a mat-raised-button color="accent" routerLink="/register">Sign Up</a>
+      <a mat-raised-button routerLink="/register">Sign Up</a>
     </div>
 
     <!-- Show when logged in -->
     <div class="user-actions" *ngIf="isLoggedIn">
       <button mat-icon-button aria-label="Shopping cart" class="cart-btn"
               [matBadge]="cartCount$ | async"
-              matBadgeColor="accent"  routerLink="/cart">
+              matBadgeColor="accent" routerLink="/cart">
         <mat-icon>shopping_cart</mat-icon>
       </button>
       
       <button mat-icon-button aria-label="AI Chat" class="chat-btn" routerLink="/chat">
-        <mat-icon>chat</mat-icon>
+        <mat-icon>smart_toy</mat-icon>
       </button>
       
       <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
@@ -49,7 +55,8 @@
     <button mat-menu-item *ngFor="let category of categories" 
             [routerLink]="['/courses']" 
             [queryParams]="{category: category.id}">
-      {{ category.name }}
+      <mat-icon>folder</mat-icon>
+      <span>{{ category.name }}</span>
     </button>
   </mat-menu>
 
@@ -65,21 +72,25 @@
       <span>Profile</span>
     </button>
     <button mat-menu-item>
-      <mat-icon>bookmark</mat-icon>
-      <span>My Courses</span>
+      <mat-icon>play_circle</mat-icon>
+      <span>My Learning</span>
     </button>
     <button mat-menu-item routerLink="/teacher">
       <mat-icon>school</mat-icon>
-      <span>Teacher Dashboard</span>
+      <span>Instructor Dashboard</span>
     </button>
     <button mat-menu-item>
       <mat-icon>favorite</mat-icon>
       <span>Wishlist</span>
     </button>
     <mat-divider></mat-divider>
+    <button mat-menu-item>
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </button>
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
-      <span>Logout</span>
+      <span>Sign Out</span>
     </button>
   </mat-menu>
 
