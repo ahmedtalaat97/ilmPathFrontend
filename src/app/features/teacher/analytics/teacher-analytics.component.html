@@ -1,0 +1,359 @@
+<div class="analytics-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>analytics</mat-icon>
+        Analytics Dashboard
+      </h1>
+      <p>Comprehensive insights into your teaching performance</p>
+    </div>
+    
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="date-filter">
+        <mat-label>Time Range</mat-label>
+        <mat-select [(value)]="selectedDateRange" (selectionChange)="onDateRangeChange()">
+          <mat-option *ngFor="let range of dateRanges" [value]="range.value">
+            {{ range.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <button mat-raised-button color="primary" (click)="exportData()">
+        <mat-icon>download</mat-icon>
+        Export Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading analytics data...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading" class="dashboard-content">
+    
+    <!-- Overview Cards -->
+    <div class="overview-section">
+      <h2>Overview</h2>
+      <div class="stats-grid">
+        
+        <!-- Total Revenue -->
+        <mat-card class="stat-card revenue">
+          <div class="stat-content">
+            <div class="stat-header">
+              <mat-icon>monetization_on</mat-icon>
+              <span class="stat-label">Total Revenue</span>
+            </div>
+            <div class="stat-value">{{ formatCurrency(summary.totalRevenue) }}</div>
+            <div class="stat-change positive" *ngIf="summary.revenueThisMonth > 0">
+              <mat-icon>trending_up</mat-icon>
+              {{ formatCurrency(summary.revenueThisMonth) }} this month
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Total Students -->
+        <mat-card class="stat-card students">
+          <div class="stat-content">
+            <div class="stat-header">
+              <mat-icon>people</mat-icon>
+              <span class="stat-label">Total Students</span>
+            </div>
+            <div class="stat-value">{{ summary.totalStudents | number }}</div>
+            <div class="stat-change positive" *ngIf="summary.studentsThisMonth > 0">
+              <mat-icon>trending_up</mat-icon>
+              +{{ summary.studentsThisMonth }} this month
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Total Courses -->
+        <mat-card class="stat-card courses">
+          <div class="stat-content">
+            <div class="stat-header">
+              <mat-icon>library_books</mat-icon>
+              <span class="stat-label">Total Courses</span>
+            </div>
+            <div class="stat-value">{{ summary.totalCourses }}</div>
+            <div class="stat-meta">
+              {{ summary.publishedCourses }} published, 
+              {{ summary.totalCourses - summary.publishedCourses }} drafts
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Average Rating -->
+        <mat-card class="stat-card rating">
+          <div class="stat-content">
+            <div class="stat-header">
+              <mat-icon>star</mat-icon>
+              <span class="stat-label">Average Rating</span>
+            </div>
+            <div class="stat-value">
+              {{ summary.averageRating | number:'1.1-1' }}
+              <span class="rating-stars">
+                <mat-icon *ngFor="let star of [1,2,3,4,5]" 
+                         [class.filled]="star <= summary.averageRating">star</mat-icon>
+              </span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Detailed Analytics Tabs -->
+    <mat-tab-group [(selectedIndex)]="selectedTab" (selectedTabChange)="onTabChange($event.index)" class="analytics-tabs">
+      
+      <!-- Course Performance Tab -->
+      <mat-tab label="Course Performance">
+        <div class="tab-content">
+          <div class="section-header">
+            <h3>Course Performance Analysis</h3>
+            <p>Detailed breakdown of how each course is performing</p>
+          </div>
+
+          <mat-table [dataSource]="courseAnalytics" class="course-performance-table" matSort>
+            
+            <!-- Course Title Column -->
+            <ng-container matColumnDef="title">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>Course</mat-header-cell>
+              <mat-cell *matCellDef="let course">
+                <div class="course-info">
+                  <img *ngIf="course.thumbnailImageUrl" 
+                       [src]="course.thumbnailImageUrl" 
+                       [alt]="course.title"
+                       class="course-thumbnail">
+                  <div class="course-details">
+                    <span class="course-title">{{ course.title }}</span>
+                    <mat-chip-set>
+                      <mat-chip [color]="course.isPublished ? 'primary' : 'accent'" selected>
+                        {{ course.isPublished ? 'Published' : 'Draft' }}
+                      </mat-chip>
+                    </mat-chip-set>
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Enrollments Column -->
+            <ng-container matColumnDef="enrollments">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>Students</mat-header-cell>
+              <mat-cell *matCellDef="let course">
+                <div class="enrollment-stat">
+                  <span class="number">{{ course.enrollments | number }}</span>
+                  <span class="label">enrolled</span>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Revenue Column -->
+            <ng-container matColumnDef="revenue">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>Revenue</mat-header-cell>
+              <mat-cell *matCellDef="let course">
+                <span class="revenue-amount">{{ formatCurrency(course.revenue) }}</span>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Rating Column -->
+            <ng-container matColumnDef="rating">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>Rating</mat-header-cell>
+              <mat-cell *matCellDef="let course">
+                <div class="rating-display">
+                  <span class="rating-number">{{ course.averageRating | number:'1.1-1' }}</span>
+                  <div class="stars">
+                    <mat-icon *ngFor="let star of [1,2,3,4,5]" 
+                             [class.filled]="star <= course.averageRating">star</mat-icon>
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Completion Rate Column -->
+            <ng-container matColumnDef="completion">
+              <mat-header-cell *matHeaderCellDef mat-sort-header>Completion</mat-header-cell>
+              <mat-cell *matCellDef="let course">
+                <div class="completion-rate">
+                  <span class="percentage">{{ course.completionRate | number:'1.0-0' }}%</span>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="course.completionRate"></div>
+                  </div>
+                </div>
+              </mat-cell>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+              <mat-cell *matCellDef="let course">
+                <button mat-icon-button [matMenuTriggerFor]="courseMenu">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #courseMenu="matMenu">
+                  <button mat-menu-item [routerLink]="['/courses', course.id]">
+                    <mat-icon>visibility</mat-icon>
+                    View Course
+                  </button>
+                  <button mat-menu-item [routerLink]="['/teacher/courses', course.id, 'edit']">
+                    <mat-icon>edit</mat-icon>
+                    Edit Course
+                  </button>
+                </mat-menu>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="courseDisplayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: courseDisplayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </mat-tab>
+
+      <!-- Revenue Analytics Tab -->
+      <mat-tab label="Revenue Analytics">
+        <div class="tab-content">
+          <div class="section-header">
+            <h3>Revenue Trends</h3>
+            <p>Track your earnings over time</p>
+          </div>
+
+          <!-- Revenue Summary Cards -->
+          <div class="revenue-summary">
+            <mat-card class="revenue-card">
+              <mat-card-header>
+                <mat-card-title>Monthly Revenue</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="revenue-amount">{{ formatCurrency(summary.revenueThisMonth) }}</div>
+                <div class="revenue-period">This Month</div>
+              </mat-card-content>
+            </mat-card>
+
+            <mat-card class="revenue-card">
+              <mat-card-header>
+                <mat-card-title>Average per Student</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="revenue-amount">
+                  {{ formatCurrency(summary.totalStudents > 0 ? summary.totalRevenue / summary.totalStudents : 0) }}
+                </div>
+                <div class="revenue-period">Lifetime</div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Revenue Table -->
+          <mat-table [dataSource]="revenueData" class="revenue-table">
+            
+            <!-- Month Column -->
+            <ng-container matColumnDef="month">
+              <mat-header-cell *matHeaderCellDef>Month</mat-header-cell>
+              <mat-cell *matCellDef="let revenue">{{ revenue.month }}</mat-cell>
+            </ng-container>
+
+            <!-- Revenue Column -->
+            <ng-container matColumnDef="revenue">
+              <mat-header-cell *matHeaderCellDef>Revenue</mat-header-cell>
+              <mat-cell *matCellDef="let revenue">{{ formatCurrency(revenue.revenue) }}</mat-cell>
+            </ng-container>
+
+            <!-- Enrollments Column -->
+            <ng-container matColumnDef="enrollments">
+              <mat-header-cell *matHeaderCellDef>New Students</mat-header-cell>
+              <mat-cell *matCellDef="let revenue">{{ revenue.enrollments | number }}</mat-cell>
+            </ng-container>
+
+            <!-- Growth Column -->
+            <ng-container matColumnDef="growth">
+              <mat-header-cell *matHeaderCellDef>Growth</mat-header-cell>
+              <mat-cell *matCellDef="let revenue; let i = index">
+                <span *ngIf="i > 0 && revenueData[i-1]" class="growth-indicator"
+                      [class.positive]="revenue.revenue > (revenueData[i-1]?.revenue || 0)"
+                      [class.negative]="revenue.revenue < (revenueData[i-1]?.revenue || 0)">
+                  <mat-icon>{{ revenue.revenue > (revenueData[i-1]?.revenue || 0) ? 'trending_up' : 'trending_down' }}</mat-icon>
+                  {{ getGrowthPercentage(revenue.revenue, revenueData[i-1]?.revenue) | number:'1.0-1' }}%
+                </span>
+                <span *ngIf="i === 0" class="growth-indicator">
+                  <mat-icon>remove</mat-icon>
+                  N/A
+                </span>
+              </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="revenueDisplayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: revenueDisplayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </mat-tab>
+
+      <!-- Student Engagement Tab -->
+      <mat-tab label="Student Engagement">
+        <div class="tab-content">
+          <div class="section-header">
+            <h3>Student Engagement Metrics</h3>
+            <p>Understand your student base and their activity</p>
+          </div>
+
+          <div class="engagement-grid">
+            <!-- Total Students -->
+            <mat-card class="engagement-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>people</mat-icon>
+                  Total Students
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="engagement-value">{{ studentEngagement.totalStudents | number }}</div>
+                <div class="engagement-label">Unique students across all courses</div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Active Students -->
+            <mat-card class="engagement-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>trending_up</mat-icon>
+                  Active Students
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="engagement-value">{{ studentEngagement.activeStudents | number }}</div>
+                <div class="engagement-label">Students enrolled in last 30 days</div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- New Students -->
+            <mat-card class="engagement-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>person_add</mat-icon>
+                  New This Month
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="engagement-value">{{ studentEngagement.newStudentsThisMonth | number }}</div>
+                <div class="engagement-label">First-time enrollments</div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Retention Rate -->
+            <mat-card class="engagement-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>refresh</mat-icon>
+                  Retention Rate
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="engagement-value">{{ studentEngagement.retentionRate | number:'1.0-0' }}%</div>
+                <div class="engagement-label">Students completing courses</div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div> 
