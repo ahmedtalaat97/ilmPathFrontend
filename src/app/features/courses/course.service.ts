@@ -112,6 +112,8 @@ export interface UploadResponse {
 export interface VideoUploadResponse {
   videoUrl: string;
   message: string;
+  durationInMinutes: number;
+  durationInSeconds: number;
 }
 
 // New interface for course update with file
