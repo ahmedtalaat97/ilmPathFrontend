@@ -1,0 +1,307 @@
+<!-- Hero Section -->
+<section class="hero-section" @fadeInUp>
+  <div class="hero-container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Transform Your Learning Journey with
+        <span class="highlight">IlmPath</span>
+      </h1>
+      <p class="hero-subtitle">
+        Experience the future of online education with AI-powered assistance, 
+        interactive video learning, and expert-led courses designed to accelerate your success.
+      </p>
+      <div class="hero-actions">
+        <button mat-raised-button color="primary" class="cta-primary" routerLink="/register">
+          <mat-icon>rocket_launch</mat-icon>
+          Start Learning Today
+        </button>
+        <button mat-stroked-button class="cta-secondary" routerLink="/courses">
+          <mat-icon>explore</mat-icon>
+          Explore Courses
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat" *ngFor="let stat of stats" @fadeInUp>
+          <span class="stat-number">{{stat.number}}</span>
+          <span class="stat-label">{{stat.label}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-image">
+        <mat-icon class="hero-icon">school</mat-icon>
+        <div class="floating-elements">
+          <div class="floating-card" style="--delay: 0s">
+            <mat-icon>smart_toy</mat-icon>
+            <span>AI Assistant</span>
+          </div>
+          <div class="floating-card" style="--delay: 1s">
+            <mat-icon>play_circle</mat-icon>
+            <span>Video Learning</span>
+          </div>
+          <div class="floating-card" style="--delay: 2s">
+            <mat-icon>analytics</mat-icon>
+            <span>Progress Tracking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="section-header" @fadeInUp>
+      <h2>Why Choose IlmPath?</h2>
+      <p>Discover the powerful features that make learning effective and enjoyable</p>
+    </div>
+    <div class="features-grid" @staggerFadeInUp>
+      <div class="feature-card" *ngFor="let feature of features" @fadeInUp>
+        <div class="feature-icon">
+          <mat-icon>{{feature.icon}}</mat-icon>
+        </div>
+        <h3>{{feature.title}}</h3>
+        <p>{{feature.description}}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+  <div class="container">
+    <div class="section-header" @fadeInUp>
+      <h2>How IlmPath Works</h2>
+      <p>Start your learning journey in just three simple steps</p>
+    </div>
+    <div class="steps-container">
+      <div class="step" @slideInLeft>
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>Sign Up & Browse</h3>
+          <p>Create your account and explore our extensive library of courses from expert instructors.</p>
+          <mat-icon class="step-icon">person_add</mat-icon>
+        </div>
+      </div>
+      <div class="step" @fadeInUp>
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Learn with AI Assistance</h3>
+          <p>Engage with interactive video content and get help from our AI learning assistant whenever you need it.</p>
+          <mat-icon class="step-icon">psychology</mat-icon>
+        </div>
+      </div>
+      <div class="step" @slideInRight>
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Track & Achieve</h3>
+          <p>Monitor your progress, complete assignments, and earn certificates to showcase your new skills.</p>
+          <mat-icon class="step-icon">emoji_events</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Courses Section -->
+<section class="featured-courses-section" id="courses">
+  <div class="container">
+    <div class="section-header" @fadeInUp>
+      <h2>Featured Courses</h2>
+      <p>Discover our most popular courses taught by industry experts</p>
+    </div>
+    <div class="courses-grid" @staggerFadeInUp>
+      <mat-card class="course-card" *ngFor="let course of featuredCourses" @fadeInUp>
+        <div class="course-image">
+          <div class="course-placeholder">
+            <mat-icon>play_circle_filled</mat-icon>
+          </div>
+        </div>
+        <mat-card-content>
+          <h3>{{course.title}}</h3>
+          <p class="instructor">by {{course.instructor}}</p>
+          <div class="course-stats">
+            <div class="rating">
+              <mat-icon *ngFor="let star of getStarArray(course.rating)">star</mat-icon>
+              <span>{{course.rating}}</span>
+            </div>
+            <div class="students">
+              <mat-icon>people</mat-icon>
+              <span>{{course.students | number}} students</span>
+            </div>
+          </div>
+          <div class="course-footer">
+            <span class="price">${{course.price}}</span>
+            <button mat-raised-button color="primary" routerLink="/register">
+              Enroll Now
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div class="courses-cta" @fadeInUp>
+      <button mat-raised-button color="accent" routerLink="/courses">
+        View All Courses
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-header" @fadeInUp>
+      <h2>What Our Students Say</h2>
+      <p>Join thousands of learners who have transformed their careers with IlmPath</p>
+    </div>
+    <div class="testimonials-grid" @staggerFadeInUp>
+      <div class="testimonial-card" *ngFor="let testimonial of testimonials" @fadeInUp>
+        <div class="testimonial-content">
+          <div class="quote-icon">
+            <mat-icon>format_quote</mat-icon>
+          </div>
+          <p>"{{testimonial.content}}"</p>
+          <div class="testimonial-rating">
+            <mat-icon *ngFor="let star of getStarArray(testimonial.rating)">star</mat-icon>
+          </div>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="author-info">
+            <h4>{{testimonial.name}}</h4>
+            <p>{{testimonial.role}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- For Teachers Section -->
+<section class="teachers-section">
+  <div class="container">
+    <div class="teachers-content" @fadeInUp>
+      <div class="teachers-text">
+        <h2>Become an Instructor</h2>
+        <p>Share your expertise and inspire learners worldwide. Our comprehensive teacher dashboard provides everything you need to create, manage, and grow your online courses.</p>
+        <div class="teacher-features">
+          <div class="teacher-feature">
+            <mat-icon>dashboard</mat-icon>
+            <span>Intuitive Course Builder</span>
+          </div>
+          <div class="teacher-feature">
+            <mat-icon>analytics</mat-icon>
+            <span>Detailed Analytics</span>
+          </div>
+          <div class="teacher-feature">
+            <mat-icon>monetization_on</mat-icon>
+            <span>Revenue Tracking</span>
+          </div>
+          <div class="teacher-feature">
+            <mat-icon>support_agent</mat-icon>
+            <span>Student Support Tools</span>
+          </div>
+        </div>
+        <button mat-raised-button color="primary" routerLink="/register">
+          <mat-icon>school</mat-icon>
+          Start Teaching Today
+        </button>
+      </div>
+      <div class="teachers-visual">
+        <div class="dashboard-preview">
+          <mat-icon class="dashboard-icon">dashboard</mat-icon>
+          <div class="dashboard-elements">
+            <div class="dashboard-card">
+              <mat-icon>trending_up</mat-icon>
+              <span>Course Analytics</span>
+            </div>
+            <div class="dashboard-card">
+              <mat-icon>people</mat-icon>
+              <span>Student Management</span>
+            </div>
+            <div class="dashboard-card">
+              <mat-icon>video_library</mat-icon>
+              <span>Content Creation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI Chat Feature Section -->
+<section class="ai-section">
+  <div class="container">
+    <div class="ai-content" @fadeInUp>
+      <div class="ai-visual">
+        <div class="chat-preview">
+          <div class="chat-header">
+            <mat-icon>smart_toy</mat-icon>
+            <span>AI Learning Assistant</span>
+          </div>
+          <div class="chat-messages">
+            <div class="message bot-message">
+              <mat-icon>smart_toy</mat-icon>
+              <span>How can I help you learn today?</span>
+            </div>
+            <div class="message user-message">
+              <span>Explain machine learning concepts</span>
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="message bot-message">
+              <mat-icon>smart_toy</mat-icon>
+              <span>I'd be happy to explain! Machine learning is...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-text">
+        <h2>Your Personal AI Learning Assistant</h2>
+        <p>Get instant help, explanations, and guidance with our advanced AI chat system. Available 24/7 to support your learning journey and answer any questions you have.</p>
+        <div class="ai-features">
+          <div class="ai-feature">
+            <mat-icon>help_outline</mat-icon>
+            <span>Instant Q&A Support</span>
+          </div>
+          <div class="ai-feature">
+            <mat-icon>lightbulb</mat-icon>
+            <span>Concept Explanations</span>
+          </div>
+          <div class="ai-feature">
+            <mat-icon>psychology</mat-icon>
+            <span>Personalized Learning Paths</span>
+          </div>
+        </div>
+        <button mat-raised-button color="accent" routerLink="/chat">
+          <mat-icon>chat</mat-icon>
+          Try AI Assistant
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content" @fadeInUp>
+      <h2>Ready to Start Learning?</h2>
+      <p>Join thousands of students who are already transforming their careers with IlmPath</p>
+      <div class="cta-actions">
+        <button mat-raised-button color="primary" class="cta-main" routerLink="/register">
+          <mat-icon>rocket_launch</mat-icon>
+          Get Started Now
+        </button>
+        <button mat-stroked-button routerLink="/login">
+          <mat-icon>login</mat-icon>
+          Already have an account?
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
