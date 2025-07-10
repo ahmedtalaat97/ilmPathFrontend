@@ -161,6 +161,12 @@ export class CourseService {
     return this.http.get<PagedResult<Course>>(url);
   }
 
+  getCoursesByInstructor(instructorId: string, pageNumber: number = 1, pageSize: number = 10): Observable<PagedResult<Course>> {
+    const url = `${this.apiUrl}/Courses/instructor?InstructorId=${instructorId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+    console.log('Making API request to get instructor courses:', url);
+    return this.http.get<PagedResult<Course>>(url);
+  }
+
   // Create a new course with optional thumbnail file
   createCourse(courseData: CreateCourseWithFileRequest): Observable<CourseCreationResponse> {
     const url = `${this.apiUrl}/Courses`;

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Course } from '../../../shared/models/course.model';
 import { CourseService } from '../../courses/course.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -42,6 +43,7 @@ export class TeacherCoursesComponent implements OnInit {
 
   constructor(
     private courseService: CourseService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
@@ -51,15 +53,24 @@ export class TeacherCoursesComponent implements OnInit {
 
   loadCourses(): void {
     this.loading = true;
-    // For now, loading all courses - in production, filter by instructor ID
-    this.courseService.getCourses().subscribe({
+    
+    // Get current user
+    const currentUser = this.authService.getCurrentUserValue();
+    if (!currentUser) {
+      console.error('No current user found');
+      this.loading = false;
+      return;
+    }
+
+    // Load courses for the current instructor
+    this.courseService.getCoursesByInstructor(currentUser.id).subscribe({
       next: (response) => {
         this.courses = response.items;
         this.calculateStats();
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading courses:', error);
+        console.error('Error loading instructor courses:', error);
         this.loading = false;
       }
     });
