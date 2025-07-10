@@ -944,17 +944,38 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
 
             this.courseService.uploadLessonVideo(lectureId, file).subscribe({
                 next: (response) => {
-                    // Update the lesson with the video URL
+                    // Update the lesson with the video URL and automatically extracted duration
                     lessonForm.patchValue({ 
                         videoUrl: response.videoUrl,
+                        duration: response.durationInMinutes, // Automatically set duration from backend
                         isUploadingVideo: false 
                     });
+                    
+                    // Show success message with duration info
+                    if (response.durationInMinutes > 0) {
+                        this.snackBar.open(
+                            `Video uploaded successfully! Duration: ${response.durationInMinutes} minutes`, 
+                            'Close', 
+                            { duration: 4000 }
+                        );
+                    } else {
+                        this.snackBar.open(
+                            'Video uploaded successfully!', 
+                            'Close', 
+                            { duration: 3000 }
+                        );
+                    }
                     
                     resolve(response.videoUrl);
                 },
                 error: (error) => {
                     console.error('Video upload failed:', error);
                     lessonForm.patchValue({ isUploadingVideo: false });
+                    this.snackBar.open(
+                        'Video upload failed. Please try again.', 
+                        'Close', 
+                        { duration: 5000 }
+                    );
                     reject(error);
                 }
             });

@@ -292,10 +292,27 @@
                                             </mat-select>
                                           </mat-form-field>
 
-                                          <mat-form-field appearance="outline" class="lesson-duration-field">
-                                            <mat-label>Duration (minutes)</mat-label>
-                                            <input matInput type="number" formControlName="duration" min="0" placeholder="0">
-                                          </mat-form-field>
+                                          <!-- Duration display (read-only for video lessons, editable for others) -->
+                                          @if (getLessonFormGroup(sectionIndex, lessonIndex).get('type')?.value === 'video') {
+                                            <!-- Read-only duration display for video lessons -->
+                                            @if (getLessonFormGroup(sectionIndex, lessonIndex).get('duration')?.value > 0) {
+                                              <div class="duration-display">
+                                                <mat-icon>schedule</mat-icon>
+                                                <span>{{ getLessonFormGroup(sectionIndex, lessonIndex).get('duration')?.value }} minutes (auto-detected)</span>
+                                              </div>
+                                            } @else {
+                                              <div class="duration-display">
+                                                <mat-icon>schedule</mat-icon>
+                                                <span>Duration will be auto-detected after video upload</span>
+                                              </div>
+                                            }
+                                          } @else {
+                                            <!-- Editable duration field for non-video lessons -->
+                                            <mat-form-field appearance="outline" class="lesson-duration-field">
+                                              <mat-label>Duration (minutes)</mat-label>
+                                              <input matInput type="number" formControlName="duration" min="0" placeholder="0">
+                                            </mat-form-field>
+                                          }
                                         </div>
 
                                         <!-- Conditional fields based on lesson type -->
