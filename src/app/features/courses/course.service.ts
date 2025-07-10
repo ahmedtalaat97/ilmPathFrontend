@@ -10,7 +10,6 @@ export interface CreateCourseRequest {
   title: string;
   description: string;
   price: number;
-  instructorId: string;
   categoryId?: number;
   thumbnailImageUrl?: string;
   isPublished?: boolean;
@@ -21,7 +20,6 @@ export interface CreateCourseWithFileRequest {
   title: string;
   description: string;
   price: number;
-  instructorId: string;
   categoryId?: number;
   thumbnailFile?: File;
   isPublished?: boolean;
@@ -161,8 +159,8 @@ export class CourseService {
     return this.http.get<PagedResult<Course>>(url);
   }
 
-  getCoursesByInstructor(instructorId: string, pageNumber: number = 1, pageSize: number = 10): Observable<PagedResult<Course>> {
-    const url = `${this.apiUrl}/Courses/instructor?InstructorId=${instructorId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+  getCoursesByInstructor(pageNumber: number = 1, pageSize: number = 10): Observable<PagedResult<Course>> {
+    const url = `${this.apiUrl}/Courses/instructor?PageNumber=${pageNumber}&PageSize=${pageSize}`;
     console.log('Making API request to get instructor courses:', url);
     return this.http.get<PagedResult<Course>>(url);
   }
@@ -183,7 +181,6 @@ export class CourseService {
     formData.append('title', courseData.title);
     formData.append('description', courseData.description);
     formData.append('price', courseData.price.toString());
-    formData.append('instructorId', courseData.instructorId);
     
     if (courseData.categoryId) {
       formData.append('categoryId', courseData.categoryId.toString());
@@ -191,6 +188,10 @@ export class CourseService {
     
     if (courseData.thumbnailFile) {
       formData.append('thumbnailFile', courseData.thumbnailFile);
+    }
+
+    if (courseData.isPublished !== undefined) {
+      formData.append('isPublished', courseData.isPublished.toString());
     }
 
     console.log('Creating course with FormData:', courseData);

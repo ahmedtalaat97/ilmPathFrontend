@@ -65,7 +65,7 @@ export class TeacherCoursesComponent implements OnInit {
 
     // Load both courses and student count in parallel
     forkJoin({
-      courses: this.courseService.getCoursesByInstructor(currentUser.id),
+      courses: this.courseService.getCoursesByInstructor(),
       studentsCount: this.courseService.getInstructorStudentsCount(currentUser.id)
     }).subscribe({
       next: (result) => {
@@ -97,7 +97,7 @@ export class TeacherCoursesComponent implements OnInit {
     }
 
     // Load courses for the current instructor
-    this.courseService.getCoursesByInstructor(currentUser.id).subscribe({
+    this.courseService.getCoursesByInstructor().subscribe({
       next: (response) => {
         this.courses = response.items;
         this.calculateStats();

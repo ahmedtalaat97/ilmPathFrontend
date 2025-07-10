@@ -348,7 +348,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
             title: formValue.title,
             description: formValue.description,
             price: formValue.price,
-            instructorId: currentUser.id,
+            // ✅ Removed instructorId - will be extracted from auth token on backend
             categoryId: formValue.categoryId,
             thumbnailFile: this.thumbnailFile || undefined, // Convert null to undefined
             isPublished: formValue.isPublished || false,
