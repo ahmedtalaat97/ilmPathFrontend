@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-teacher-courses',
@@ -48,7 +49,40 @@ export class TeacherCoursesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadCourses();
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.loading = true;
+    
+    // Get current user
+    const currentUser = this.authService.getCurrentUserValue();
+    if (!currentUser) {
+      console.error('No current user found');
+      this.loading = false;
+      return;
+    }
+
+    // Load both courses and student count in parallel
+    forkJoin({
+      courses: this.courseService.getCoursesByInstructor(currentUser.id),
+      studentsCount: this.courseService.getInstructorStudentsCount(currentUser.id)
+    }).subscribe({
+      next: (result) => {
+        this.courses = result.courses.items;
+        this.totalEnrollments = result.studentsCount;
+        this.calculateStats();
+        this.loading = false;
+        console.log('Dashboard data loaded:', {
+          coursesCount: this.courses.length,
+          studentsCount: this.totalEnrollments
+        });
+      },
+      error: (error) => {
+        console.error('Error loading dashboard data:', error);
+        this.loading = false;
+      }
+    });
   }
 
   loadCourses(): void {
@@ -80,8 +114,7 @@ export class TeacherCoursesComponent implements OnInit {
     this.totalCourses = this.courses.length;
     this.publishedCourses = this.courses.filter(c => c.isPublished).length;
     this.draftCourses = this.courses.filter(c => !c.isPublished).length;
-    // TODO: Calculate enrollments from enrollment data
-    this.totalEnrollments = 0;
+    // totalEnrollments is now loaded from the API, no need to calculate here
   }
 
   createCourse(): void {

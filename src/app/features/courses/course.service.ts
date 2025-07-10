@@ -167,6 +167,13 @@ export class CourseService {
     return this.http.get<PagedResult<Course>>(url);
   }
 
+  // Get total students count for an instructor
+  getInstructorStudentsCount(instructorId: string): Observable<number> {
+    const url = `${this.apiUrl}/Enrollments/instructor/${instructorId}/students-count`;
+    console.log('Making API request to get instructor students count:', url);
+    return this.http.get<number>(url);
+  }
+
   // Create a new course with optional thumbnail file
   createCourse(courseData: CreateCourseWithFileRequest): Observable<CourseCreationResponse> {
     const url = `${this.apiUrl}/Courses`;
