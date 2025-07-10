@@ -3,6 +3,10 @@ import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { 
+    path: 'landing', 
+    loadComponent: () => import('./features/landing/landing.component').then(c => c.LandingComponent)
+  },
+  { 
     path: 'login', 
     loadComponent: () => import('./features/auth/login/login.component').then(c => c.LoginComponent)
   },
@@ -64,6 +68,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/courses/my-courses/my-courses.component').then(c => c.MyCoursesComponent),
     canActivate: [AuthGuard]
   },
-  { path: '', redirectTo: 'courses', pathMatch: 'full' },
-  { path: '**', redirectTo: 'courses' } // Wildcard route for 404 pages
+  { path: '', redirectTo: 'landing', pathMatch: 'full' },
+  { path: '**', redirectTo: 'landing' } // Wildcard route for 404 pages
 ]; 

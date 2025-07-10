@@ -1,10 +1,16 @@
 <mat-toolbar class="navbar">
-    <a routerLink="/" class="logo">
+    <a routerLink="/landing" class="logo">
       <mat-icon>school</mat-icon>
       <span>IlmPath</span>
     </a>
   
     <div class="nav-links">
+      <!-- Show Home link for non-authenticated users -->
+      <a mat-button routerLink="/landing" *ngIf="!isLoggedIn">
+        <mat-icon>home</mat-icon>
+        <span>Home</span>
+      </a>
+      
       <a mat-button routerLink="/courses">
         <mat-icon>explore</mat-icon>
         <span>Courses</span>
@@ -48,7 +54,7 @@
       
       <span class="user-name">{{ getUserDisplayName() }}</span>
     </div>
-  </mat-toolbar>
+  
   
   <!-- Categories Menu -->
   <mat-menu #categoriesMenu="matMenu">
