@@ -1,169 +1,318 @@
 <!-- Loading State -->
-<div *ngIf="loading">Loading course details...</div>
-<div *ngIf="error" class="error">{{ error }}</div>
-
-<div class="course-details-container" [@fadeInOut]>
-  <!-- Desktop: Two columns -->
-  <div class="main-content">
-    <mat-card class="details-card">
-      <ng-container *ngIf="!isMobile; else mobileCard">
-        <mat-card-header>
-          <mat-card-title>{{ course?.title }}</mat-card-title>
-          <mat-card-subtitle>Instructor: {{ course?.instructorName || 'Unknown' }}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <p>{{ course?.description }}</p>
-          <p><strong>Duration:</strong> {{ totalDuration }} minutes</p>
-          <h3>Course content</h3>
-          <mat-accordion *ngIf="sections.length; else noSections">
-            <mat-expansion-panel *ngFor="let section of sections">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  {{ section.title }}
-                </mat-panel-title>
-                <mat-panel-description>
-                  {{ lecturesBySection[section.id]?.length || 0 }} lectures
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              <mat-list *ngIf="lecturesBySection[section.id]?.length; else noLectures">
-                <mat-list-item *ngFor="let lecture of lecturesBySection[section.id]">
-                  <span>{{ lecture.title }}</span>
-                  <span class="lecture-duration" style="margin-left:auto; display: block;">{{ lecture.durationInMinutes || 0 }} min</span>
-                </mat-list-item>
-              </mat-list>
-              <ng-template #noLectures>
-                <p style="margin: 0 16px;">No lectures in this section.</p>
-              </ng-template>
-            </mat-expansion-panel>
-          </mat-accordion>
-          <ng-template #noSections>
-            <p>No sections available for this course.</p>
-          </ng-template>
-        </mat-card-content>
-      </ng-container>
-      <ng-template #mobileCard>
-        <!-- Mobile: Merge summary and details -->
-        <img mat-card-image [src]="course?.thumbnailImageUrl || 'https://placehold.co/600x400?text=Course'" [alt]="course?.title">
-        <mat-card-content>
-          
-          <!-- Enrolled User Actions (Mobile) -->
-          <div *ngIf="isEnrolled" class="enrolled-actions">
-            <button mat-raised-button color="primary" class="start-learning-btn" (click)="startLearning()">
-              <mat-icon>play_circle</mat-icon>
-              Start Learning
-            </button>
-            <mat-chip color="accent" selected>✓ Enrolled</mat-chip>
-          </div>
-
-          <!-- Purchase Options (Mobile) -->
-          <div *ngIf="!isEnrolled && !checkingEnrollment">
-            <div class="price-row">
-              <span class="price-label">Price:</span>
-              <span class="price-value">${{ course?.price }}</span>
-            </div>
-            <form (ngSubmit)="applyCoupon()" class="coupon-form">
-              <mat-form-field appearance="fill">
-                <mat-label>Coupon Code</mat-label>
-                <input matInput [formControl]="couponControl" placeholder="Enter coupon code">
-              </mat-form-field>
-              <button mat-flat-button color="primary" type="button" (click)="applyCoupon()">Apply</button>
-            </form>
-            <div *ngIf="couponApplied">
-              <mat-chip color="primary" selected>Coupon {{ couponApplied }} applied!</mat-chip>
-            </div>
-            <div class="summary-actions">
-              <button mat-flat-button color="accent" class="add-to-cart" (click)="addToCart()">Add to Cart</button>
-              <button mat-icon-button color="warn" aria-label="Add to wishlist">
-                <mat-icon>favorite_border</mat-icon>
-              </button>
-            </div>
-          </div>
-
-          <!-- Loading Enrollment Status -->
-          <div *ngIf="checkingEnrollment" class="enrollment-loading">
-            <mat-chip>Checking enrollment...</mat-chip>
-          </div>
-
-          <div class="mobile-details-separator"></div>
-          <mat-card-title>{{ course?.title }}</mat-card-title>
-          <mat-card-subtitle>Instructor: {{ course?.instructorName || 'Unknown' }}</mat-card-subtitle>
-          <p>{{ course?.description }}</p>
-          <p><strong>Duration:</strong> {{ totalDuration }} minutes</p>
-          <h3>Course content</h3>
-          <mat-accordion *ngIf="sections.length; else noSections">
-            <mat-expansion-panel *ngFor="let section of sections">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  {{ section.title }}
-                </mat-panel-title>
-                <mat-panel-description>
-                  {{ lecturesBySection[section.id]?.length || 0 }} lectures
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              <mat-list *ngIf="lecturesBySection[section.id]?.length; else noLectures">
-                <mat-list-item *ngFor="let lecture of lecturesBySection[section.id]">
-                  <span>{{ lecture.title }}</span>
-                  <span class="lecture-duration" style="margin-left:auto; display: block;">{{ lecture.durationInMinutes || 0 }} min</span>
-                </mat-list-item>
-              </mat-list>
-              <ng-template #noLectures>
-                <p style="margin: 0 16px;">No lectures in this section.</p>
-              </ng-template>
-            </mat-expansion-panel>
-          </mat-accordion>
-          <ng-template #noSections>
-            <p>No sections available for this course.</p>
-          </ng-template>
-        </mat-card-content>
-      </ng-template>
-    </mat-card>
+<div *ngIf="loading" class="loading-state">
+  <div class="loading-content">
+    <mat-spinner diameter="60"></mat-spinner>
+    <h2>Loading course details...</h2>
+    <p>Please wait while we fetch the course information</p>
   </div>
+</div>
 
-  <!-- Desktop: Summary Card on the right -->
-  <div class="summary-card" *ngIf="!isMobile">
-    <mat-card>
-      <img mat-card-image [src]="course?.thumbnailImageUrl || 'https://placehold.co/600x400?text=Course'" [alt]="course?.title">
-      <mat-card-content>
+<!-- Error State -->
+<div *ngIf="error" class="error-state">
+  <div class="error-content">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h2>{{ error }}</h2>
+    <button mat-raised-button color="primary" (click)="fetchCourseDetails(course?.id || 0)">
+      <mat-icon>refresh</mat-icon>
+      Try Again
+    </button>
+  </div>
+</div>
+
+<!-- Course Details -->
+<div class="course-details-wrapper" [@fadeInOut] *ngIf="!loading && !error">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background">
+      <img [src]="course?.thumbnailImageUrl || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80'" 
+           [alt]="course?.title" class="hero-image">
+      <div class="hero-overlay"></div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="container">
+        <div class="hero-info">
+          <div class="course-badge">
+            <mat-icon>school</mat-icon>
+            <span>Online Course</span>
+          </div>
+          
+          <h1 class="course-title">{{ course?.title }}</h1>
+          
+          <div class="course-meta">
+            <div class="instructor-info">
+              <mat-icon>person</mat-icon>
+              <span>{{ course?.instructorName || 'Unknown Instructor' }}</span>
+            </div>
+            
+            <div class="duration-info">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ totalDuration }} minutes</span>
+            </div>
+            
+            <div class="sections-info">
+              <mat-icon>library_books</mat-icon>
+              <span>{{ sections.length }} sections</span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="main-content-wrapper">
+    <div class="container">
+      <div class="content-grid">
         
-        <!-- Enrolled User Actions (Desktop) -->
-        <div *ngIf="isEnrolled" class="enrolled-actions">
-          <button mat-raised-button color="primary" class="start-learning-btn" (click)="startLearning()">
-            <mat-icon>play_circle</mat-icon>
-            Start Learning
-          </button>
-          <mat-chip color="accent" selected>✓ Enrolled</mat-chip>
+        <!-- Left Column - Course Details -->
+        <div class="course-content">
+          
+          <!-- Course Description -->
+          <section class="description-section">
+            <h2 class="section-title">
+              <mat-icon>description</mat-icon>
+              About this course
+            </h2>
+            <div class="description-content">
+              <p>{{ course?.description }}</p>
+            </div>
+          </section>
+
+          <!-- Course Curriculum -->
+          <section class="curriculum-section">
+            <h2 class="section-title">
+              <mat-icon>playlist_play</mat-icon>
+              Course Curriculum
+            </h2>
+            
+            <!-- Course Overview Stats -->
+            <div class="curriculum-overview">
+              <div class="overview-stats">
+                <div class="stat-item">
+                  <span class="stat-number">{{ sections.length }}</span>
+                  <span class="stat-label">Sections</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">{{ lectures.length }}</span>
+                  <span class="stat-label">Lectures</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">{{ totalDuration }}</span>
+                  <span class="stat-label">Total Minutes</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Curriculum Content -->
+            <div class="curriculum-content">
+              <div *ngIf="sections.length; else noSections" class="sections-container">
+                <mat-accordion class="curriculum-accordion" multi="true">
+                  <mat-expansion-panel *ngFor="let section of sections; let i = index" class="section-panel">
+                    <mat-expansion-panel-header class="section-header">
+                      <mat-panel-title class="section-title-panel">
+                        <div class="section-number">{{ i + 1 }}</div>
+                        <div class="section-info">
+                          <h4>{{ section.title }}</h4>
+                          <span class="section-meta">{{ lecturesBySection[section.id]?.length || 0 }} lectures • {{ getSectionDuration(section.id) }} min</span>
+                        </div>
+                      </mat-panel-title>
+                      <mat-panel-description class="section-toggle">
+                        <mat-icon>expand_more</mat-icon>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    
+                    <div class="lectures-list" *ngIf="lecturesBySection[section.id]?.length; else noLectures">
+                      <div *ngFor="let lecture of lecturesBySection[section.id]; let j = index" class="lecture-item">
+                        <div class="lecture-number">{{ j + 1 }}</div>
+                        <div class="lecture-icon">
+                          <mat-icon>play_circle_outline</mat-icon>
+                        </div>
+                        <div class="lecture-content">
+                          <h5 class="lecture-title">{{ lecture.title }}</h5>
+                          <div class="lecture-meta">
+                            <span class="lecture-duration">
+                              <mat-icon>schedule</mat-icon>
+                              {{ lecture.durationInMinutes || 0 }} min
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <ng-template #noLectures>
+                      <div class="no-lectures">
+                        <mat-icon>info</mat-icon>
+                        <span>No lectures available in this section</span>
+                      </div>
+                    </ng-template>
+                  </mat-expansion-panel>
+                </mat-accordion>
+              </div>
+              
+              <ng-template #noSections>
+                <div class="no-content">
+                  <mat-icon>school</mat-icon>
+                  <h3>Course content coming soon</h3>
+                  <p>The instructor is still preparing the course materials.</p>
+                </div>
+              </ng-template>
+            </div>
+          </section>
+
+          <!-- Reviews Section -->
+          <section class="reviews-section" *ngIf="course">
+            <h2 class="section-title">
+              <mat-icon>star</mat-icon>
+              Student Reviews
+            </h2>
+            
+            <!-- Rating Summary -->
+            <div class="rating-summary-container">
+              <app-rating-summary 
+                [courseId]="course.id"
+                [showBreakdown]="true"
+                class="detailed-rating-summary">
+              </app-rating-summary>
+            </div>
+
+            <!-- Add Rating Section for Enrolled Users -->
+            <div *ngIf="isEnrolled && course" class="add-rating-container">
+              <div *ngIf="!showAddRating" class="add-rating-prompt">
+                <button mat-raised-button color="primary" (click)="toggleAddRating()" class="rate-button">
+                  <mat-icon>star_rate</mat-icon>
+                  Share Your Experience
+                </button>
+              </div>
+              
+              <div *ngIf="showAddRating" class="add-rating-form">
+                <app-add-rating 
+                  [courseId]="course.id"
+                  (ratingAdded)="onRatingAdded()">
+                </app-add-rating>
+                <button mat-button (click)="toggleAddRating()" class="cancel-rating-btn">
+                  <mat-icon>close</mat-icon>
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Ratings List -->
+            <div class="ratings-list-container">
+              <app-course-ratings 
+                [courseId]="course.id"
+                class="course-ratings-list">
+              </app-course-ratings>
+            </div>
+          </section>
         </div>
 
-        <!-- Purchase Options (Desktop) -->
-        <div *ngIf="!isEnrolled && !checkingEnrollment">
-          <div class="price-row">
-            <span class="price-label">Price:</span>
-            <span class="price-value">${{ course?.price }}</span>
-          </div>
-          <form (ngSubmit)="applyCoupon()" class="coupon-form">
-            <mat-form-field appearance="fill">
-              <mat-label>Coupon Code</mat-label>
-              <input matInput [formControl]="couponControl" placeholder="Enter coupon code">
-            </mat-form-field>
-            <button mat-flat-button color="primary" type="button" (click)="applyCoupon()">Apply</button>
-          </form>
-          <div *ngIf="couponApplied">
-            <mat-chip color="primary" selected>Coupon {{ couponApplied }} applied!</mat-chip>
-          </div>
-          <div class="summary-actions">
-            <button mat-flat-button color="accent" class="add-to-cart" (click)="addToCart()">Add to Cart</button>
-            <button mat-icon-button color="warn" aria-label="Add to wishlist">
-              <mat-icon>favorite_border</mat-icon>
-            </button>
-          </div>
-        </div>
+        <!-- Right Column - Purchase/Enrollment Card -->
+        <aside class="sidebar">
+          <div class="purchase-card">
+            <div class="card-content">
+              
+              <!-- Course Preview Image -->
+              <div class="course-preview">
+                <img [src]="course?.thumbnailImageUrl || 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'" 
+                     [alt]="course?.title" class="preview-image">
+                <div class="preview-overlay">
+                  <button mat-fab color="primary" class="preview-play-btn">
+                    <mat-icon>play_arrow</mat-icon>
+                  </button>
+                </div>
+              </div>
 
-        <!-- Loading Enrollment Status -->
-        <div *ngIf="checkingEnrollment" class="enrollment-loading">
-          <mat-chip>Checking enrollment...</mat-chip>
-        </div>
+              <!-- Enrolled State -->
+              <div *ngIf="isEnrolled" class="enrolled-state">
+                <div class="enrolled-badge">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>You're enrolled!</span>
+                </div>
+                <button mat-raised-button color="primary" class="start-learning-btn" (click)="startLearning()">
+                  <mat-icon>play_circle</mat-icon>
+                  Continue Learning
+                </button>
+              </div>
 
-      </mat-card-content>
-    </mat-card>
+              <!-- Purchase State -->
+              <div *ngIf="!isEnrolled && !checkingEnrollment" class="purchase-state">
+                <div class="price-section">
+                  <div class="price-display">
+                    <span class="currency">$</span>
+                    <span class="price">{{ course?.price }}</span>
+                  </div>
+                  <div class="price-note">One-time payment</div>
+                </div>
+
+                <!-- Coupon Section -->
+                <div class="coupon-section">
+                  <mat-form-field appearance="outline" class="coupon-field">
+                    <mat-label>Coupon Code</mat-label>
+                    <input matInput [formControl]="couponControl" placeholder="Enter code">
+                    <button mat-icon-button matSuffix (click)="applyCoupon()" [disabled]="!couponControl.value">
+                      <mat-icon>local_offer</mat-icon>
+                    </button>
+                  </mat-form-field>
+                  
+                  <div *ngIf="couponApplied" class="coupon-applied">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Coupon "{{ couponApplied }}" applied!</span>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                  <button mat-raised-button color="primary" class="enroll-btn" (click)="addToCart()">
+                    <mat-icon>shopping_cart</mat-icon>
+                    Add to Cart
+                  </button>
+                  
+                  <button mat-stroked-button class="wishlist-btn">
+                    <mat-icon>favorite_border</mat-icon>
+                    Wishlist
+                  </button>
+                </div>
+
+                <!-- Course Features -->
+                <div class="course-features">
+                  <h4>This course includes:</h4>
+                  <ul class="features-list">
+                    <li>
+                      <mat-icon>ondemand_video</mat-icon>
+                      <span>{{ totalDuration }} minutes of on-demand video</span>
+                    </li>
+                    <li>
+                      <mat-icon>article</mat-icon>
+                      <span>{{ lectures.length }} downloadable resources</span>
+                    </li>
+                    <li>
+                      <mat-icon>all_inclusive</mat-icon>
+                      <span>Full lifetime access</span>
+                    </li>
+                    <li>
+                      <mat-icon>phone_android</mat-icon>
+                      <span>Access on mobile and desktop</span>
+                    </li>
+                    <li>
+                      <mat-icon>workspace_premium</mat-icon>
+                      <span>Certificate of completion</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Loading State -->
+              <div *ngIf="checkingEnrollment" class="loading-state-sidebar">
+                <mat-spinner diameter="30"></mat-spinner>
+                <span>Checking enrollment status...</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
   </div>
 </div>
