@@ -16,6 +16,11 @@ import { CartService } from '../cart.service';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { trigger, transition, style, animate } from '@angular/animations';
+// Rating system imports
+import { RatingService } from '../rating.service';
+import { CourseRatingsComponent } from '../components/course-ratings/course-ratings.component';
+import { AddRatingComponent } from '../components/add-rating/add-rating.component';
+import { RatingSummaryComponent } from '../components/rating-summary/rating-summary.component';
 
 
 @Component({
@@ -33,7 +38,11 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatExpansionModule,
     MatIconModule,
     LoaderComponent,
-    MatSnackBarModule
+    MatSnackBarModule,
+    // Rating components
+    CourseRatingsComponent,
+    AddRatingComponent,
+    RatingSummaryComponent,
   ],
   templateUrl: './course-details.component.html',
   styleUrl: './course-details.component.css',
@@ -57,6 +66,7 @@ export class CourseDetailsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private cartService = inject(CartService);
   private snackBar = inject(MatSnackBar);
+  private ratingService = inject(RatingService);
 
   course: CourseCreationResponse | null = null;
   sections: SectionResponse[] = [];
@@ -73,6 +83,11 @@ export class CourseDetailsComponent implements OnInit {
   lecturesBySection: { [sectionId: number]: LessonResponse[] } = {};
 
   isMobile = false;
+
+  // Rating-related properties
+  showAddRating = false;
+  averageRating = 0;
+  totalRatings = 0;
 
   ngOnInit() {
     this.checkMobile();
@@ -96,6 +111,7 @@ export class CourseDetailsComponent implements OnInit {
       next: (course) => {
         this.course = course;
         this.checkEnrollmentStatus(id);
+        this.loadRatingSummary(id); // Load rating summary
         this.courseService.getSectionsByCourse(id).subscribe({
           next: (sections) => {
             this.sections = sections;
@@ -182,6 +198,41 @@ export class CourseDetailsComponent implements OnInit {
   startLearning() {
     if (this.course) {
       this.router.navigate(['/courses', this.course.id, 'learn']);
+    }
+  }
+
+  // Rating-related methods
+  loadRatingSummary(courseId: number) {
+    const query = { pageNumber: 1, pageSize: 1 };
+    this.ratingService.getCourseRatings(courseId, query).subscribe({
+      next: (response) => {
+        // Calculate basic stats from the first page
+        this.totalRatings = response.totalCount;
+        // For a more accurate average, you might want to fetch all ratings or have a separate endpoint
+        if (response.items.length > 0) {
+          this.averageRating = response.items[0].ratingValue; // This is just the first rating
+          // For better accuracy, implement a separate endpoint for rating summary
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load rating summary:', err);
+      }
+    });
+  }
+
+  toggleAddRating() {
+    this.showAddRating = !this.showAddRating;
+  }
+
+  onRatingAdded() {
+    this.showAddRating = false;
+    this.snackBar.open('Rating added successfully!', 'Close', { 
+      duration: 3000, 
+      panelClass: 'snackbar-success' 
+    });
+    // Reload rating summary
+    if (this.course) {
+      this.loadRatingSummary(this.course.id);
     }
   }
 }

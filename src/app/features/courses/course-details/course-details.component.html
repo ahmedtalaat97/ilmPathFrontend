@@ -14,6 +14,8 @@
         <mat-card-content>
           <p>{{ course?.description }}</p>
           <p><strong>Duration:</strong> {{ totalDuration }} minutes</p>
+          
+          <!-- Course Content -->
           <h3>Course content</h3>
           <mat-accordion *ngIf="sections.length; else noSections">
             <mat-expansion-panel *ngFor="let section of sections">
@@ -39,6 +41,42 @@
           <ng-template #noSections>
             <p>No sections available for this course.</p>
           </ng-template>
+
+          <!-- Rating Summary -->
+          <div class="rating-summary-section" *ngIf="course">
+            <app-rating-summary 
+              [courseId]="course.id"
+              class="course-rating-summary">
+            </app-rating-summary>
+          </div>
+
+          <!-- Add Rating Section for Enrolled Users -->
+          <div *ngIf="isEnrolled && course" class="add-rating-section">
+            <div *ngIf="!showAddRating" class="add-rating-prompt">
+              <button mat-raised-button color="primary" (click)="toggleAddRating()">
+                <mat-icon>star_rate</mat-icon>
+                Rate this Course
+              </button>
+            </div>
+            
+            <div *ngIf="showAddRating" class="add-rating-form">
+              <app-add-rating 
+                [courseId]="course.id"
+                (ratingAdded)="onRatingAdded()">
+              </app-add-rating>
+              <button mat-stroked-button (click)="toggleAddRating()" class="cancel-rating-btn">
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <!-- Ratings List -->
+          <div *ngIf="course" class="ratings-list-section">
+            <app-course-ratings 
+              [courseId]="course.id"
+              class="course-ratings-list">
+            </app-course-ratings>
+          </div>
         </mat-card-content>
       </ng-container>
       <ng-template #mobileCard>
@@ -89,6 +127,8 @@
           <mat-card-subtitle>Instructor: {{ course?.instructorName || 'Unknown' }}</mat-card-subtitle>
           <p>{{ course?.description }}</p>
           <p><strong>Duration:</strong> {{ totalDuration }} minutes</p>
+          
+          <!-- Course Content -->
           <h3>Course content</h3>
           <mat-accordion *ngIf="sections.length; else noSections">
             <mat-expansion-panel *ngFor="let section of sections">
@@ -114,6 +154,42 @@
           <ng-template #noSections>
             <p>No sections available for this course.</p>
           </ng-template>
+          
+          <!-- Rating Summary (Mobile) -->
+          <div class="rating-summary-section" *ngIf="course">
+            <app-rating-summary 
+              [courseId]="course.id"
+              class="course-rating-summary">
+            </app-rating-summary>
+          </div>
+
+          <!-- Add Rating Section for Enrolled Users (Mobile) -->
+          <div *ngIf="isEnrolled && course" class="add-rating-section">
+            <div *ngIf="!showAddRating" class="add-rating-prompt">
+              <button mat-raised-button color="primary" (click)="toggleAddRating()">
+                <mat-icon>star_rate</mat-icon>
+                Rate Course
+              </button>
+            </div>
+            
+            <div *ngIf="showAddRating" class="add-rating-form">
+              <app-add-rating 
+                [courseId]="course.id"
+                (ratingAdded)="onRatingAdded()">
+              </app-add-rating>
+              <button mat-stroked-button (click)="toggleAddRating()" class="cancel-rating-btn">
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <!-- Ratings List (Mobile) -->
+          <div *ngIf="course" class="ratings-list-section">
+            <app-course-ratings 
+              [courseId]="course.id"
+              class="course-ratings-list">
+            </app-course-ratings>
+          </div>
         </mat-card-content>
       </ng-template>
     </mat-card>
