@@ -1,50 +1,92 @@
 <div class="login-container">
-  <mat-card class="login-card">
-    <mat-card-header>
-      <mat-card-title>Welcome back to IlmPath</mat-card-title>
-      <mat-card-subtitle>Sign in to continue your learning journey</mat-card-subtitle>
-    </mat-card-header>
-    
-    <mat-card-content>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="Enter your email">
-          <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
-            {{ getFieldError('email') }}
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" placeholder="Enter your password">
-          <mat-icon matSuffix>lock</mat-icon>
-          <mat-error *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
-            {{ getFieldError('password') }}
-          </mat-error>
-        </mat-form-field>
-
-        <div class="error-message" *ngIf="errorMessage">
-          <mat-icon>error</mat-icon>
-          <span>{{ errorMessage }}</span>
-        </div>
-
-        <button mat-flat-button color="primary" type="submit" 
-                [disabled]="loginForm.invalid || isLoading" class="full-width login-button">
-          <app-loader [diameter]="20" *ngIf="isLoading"></app-loader>
-          <span *ngIf="!isLoading">Sign In</span>
-          <span *ngIf="isLoading">Signing In...</span>
-        </button>
-      </form>
-    </mat-card-content>
-    
-    <mat-card-actions>
-      <div class="register-link">
-        <p>Don't have an account? 
-          <a routerLink="/register" mat-button color="accent">Create Account</a>
-        </p>
+  <div class="background-elements">
+    <div class="floating-shape shape1"></div>
+    <div class="floating-shape shape2"></div>
+    <div class="floating-shape shape3"></div>
+  </div>
+  
+  <div class="login-content">
+    <div class="login-header">
+      <div class="logo">
+        <mat-icon>school</mat-icon>
+        <span>IlmPath</span>
       </div>
-    </mat-card-actions>
-  </mat-card>
+      <h1>Welcome Back!</h1>
+      <p>Sign in to continue your learning journey</p>
+    </div>
+
+    <mat-card class="login-card">
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Address</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="Enter your email">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+              {{ getFieldError('email') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Enter your password">
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+              <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+              {{ getFieldError('password') }}
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-options">
+            <mat-checkbox color="primary">Remember me</mat-checkbox>
+            <a href="#" class="forgot-password">Forgot password?</a>
+          </div>
+
+          <div class="error-message" *ngIf="errorMessage">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="loginForm.invalid || isLoading" class="full-width login-button">
+            <mat-icon *ngIf="!isLoading">login</mat-icon>
+            <app-loader [diameter]="20" *ngIf="isLoading"></app-loader>
+            <span *ngIf="!isLoading">Sign In</span>
+            <span *ngIf="isLoading">Signing In...</span>
+          </button>
+
+          <div class="divider">
+            <span>or</span>
+          </div>
+
+          <button mat-stroked-button type="button" class="full-width social-button google-button">
+            <mat-icon>google</mat-icon>
+            <span>Continue with Google</span>
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+    
+    <div class="register-link">
+      <p>Don't have an account? 
+        <a routerLink="/register" class="register-link-btn">Create Account</a>
+      </p>
+    </div>
+
+    <div class="features-preview">
+      <div class="feature-item">
+        <mat-icon>smart_toy</mat-icon>
+        <span>AI-Powered Learning</span>
+      </div>
+      <div class="feature-item">
+        <mat-icon>video_library</mat-icon>
+        <span>HD Video Content</span>
+      </div>
+      <div class="feature-item">
+        <mat-icon>school</mat-icon>
+        <span>Expert Instructors</span>
+      </div>
+    </div>
+  </div>
 </div> 

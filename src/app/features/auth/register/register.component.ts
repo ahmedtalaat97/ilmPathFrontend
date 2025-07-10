@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-register',
@@ -24,7 +25,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatDividerModule
+    MatDividerModule,
+    MatCheckboxModule
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
@@ -34,6 +36,8 @@ export class RegisterComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  hidePassword = true;
+  hideConfirmPassword = true;
 
   constructor(
     private fb: FormBuilder,
@@ -46,7 +50,8 @@ export class RegisterComponent implements OnInit {
       userName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required]],
+      agreeToTerms: [false, [Validators.requiredTrue]]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -82,8 +87,8 @@ export class RegisterComponent implements OnInit {
       this.errorMessage = '';
       this.successMessage = '';
 
-      // Remove confirmPassword from the data sent to backend
-      const { confirmPassword, ...registerData } = this.registerForm.value;
+      // Remove confirmPassword and agreeToTerms from the data sent to backend
+      const { confirmPassword, agreeToTerms, ...registerData } = this.registerForm.value;
       console.log('registerData', registerData);
       this.authService.register(registerData).subscribe({
         next: (response) => {
@@ -120,6 +125,9 @@ export class RegisterComponent implements OnInit {
     const field = this.registerForm.get(fieldName);
     if (field?.hasError('required')) {
       return `${this.capitalizeFirst(fieldName)} is required`;
+    }
+    if (field?.hasError('requiredTrue')) {
+      return 'You must agree to the terms and conditions';
     }
     if (field?.hasError('email')) {
       return 'Please enter a valid email address';
