@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 @Component({
@@ -26,6 +27,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
     MatIconModule,
     MatProgressSpinnerModule,
     MatDividerModule,
+    MatCheckboxModule,
     LoaderComponent
   ],
   templateUrl: './login.component.html',
@@ -36,6 +38,7 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   returnUrl = '';
+  hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
