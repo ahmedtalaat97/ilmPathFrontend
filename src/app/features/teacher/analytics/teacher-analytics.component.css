@@ -1,0 +1,543 @@
+.analytics-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 24px 0;
+  border-bottom: 1px solid #333;
+}
+
+.header-content h1 {
+  margin: 0 0 8px 0;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 2.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-content h1 mat-icon {
+  font-size: 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  color: #667eea;
+}
+
+.header-content p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.date-filter {
+  min-width: 160px;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-container p {
+  margin-top: 16px;
+  font-size: 1.1rem;
+}
+
+/* Overview Section */
+.overview-section {
+  margin-bottom: 40px;
+}
+
+.overview-section h2 {
+  margin: 0 0 24px 0;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #2d1b69 0%, #11998e 100%) !important;
+  color: white;
+  border-radius: 16px !important;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card.revenue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.stat-card.students {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+.stat-card.courses {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.stat-card.rating {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;
+}
+
+.stat-content {
+  padding: 24px;
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-header mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  opacity: 0.9;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.stat-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.stat-change mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.stat-change.positive {
+  color: #90EE90;
+}
+
+.stat-change.negative {
+  color: #FFB6C1;
+}
+
+.stat-meta {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 8px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.rating-stars mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.rating-stars mat-icon.filled {
+  color: #FFD700;
+}
+
+/* Tabs */
+.analytics-tabs {
+  background: #1e1e1e;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.analytics-tabs ::ng-deep .mat-tab-label {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500;
+}
+
+.analytics-tabs ::ng-deep .mat-tab-label.mat-tab-label-active {
+  color: #667eea !important;
+}
+
+.analytics-tabs ::ng-deep .mat-ink-bar {
+  background-color: #667eea !important;
+}
+
+.tab-content {
+  padding: 32px;
+  min-height: 500px;
+}
+
+.section-header {
+  margin-bottom: 32px;
+}
+
+.section-header h3 {
+  margin: 0 0 8px 0;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.section-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+/* Course Performance Table */
+.course-performance-table {
+  width: 100%;
+  background: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.course-performance-table ::ng-deep .mat-header-cell {
+  background: #333;
+  color: rgba(255, 255, 255, 0.87);
+  font-weight: 600;
+  border-bottom: 1px solid #444;
+}
+
+.course-performance-table ::ng-deep .mat-cell {
+  color: rgba(255, 255, 255, 0.87);
+  border-bottom: 1px solid #333;
+}
+
+.course-performance-table ::ng-deep .mat-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.course-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.course-thumbnail {
+  width: 48px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.course-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.course-title {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.enrollment-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.enrollment-stat .number {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.enrollment-stat .label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.revenue-amount {
+  font-weight: 600;
+  color: #43e97b;
+  font-size: 1.1rem;
+}
+
+.rating-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rating-number {
+  font-weight: 600;
+  color: #FFD700;
+}
+
+.stars {
+  display: flex;
+  gap: 1px;
+}
+
+.stars mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.stars mat-icon.filled {
+  color: #FFD700;
+}
+
+.completion-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.percentage {
+  font-weight: 600;
+  color: #4facfe;
+}
+
+.progress-bar {
+  width: 60px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Revenue Analytics */
+.revenue-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.revenue-card {
+  background: #2a2a2a !important;
+  border-radius: 12px !important;
+}
+
+.revenue-card ::ng-deep .mat-card-header {
+  padding-bottom: 8px;
+}
+
+.revenue-card ::ng-deep .mat-card-title {
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.revenue-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 4px;
+}
+
+.revenue-period {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+.revenue-table {
+  width: 100%;
+  background: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.revenue-table ::ng-deep .mat-header-cell {
+  background: #333;
+  color: rgba(255, 255, 255, 0.87);
+  font-weight: 600;
+  border-bottom: 1px solid #444;
+}
+
+.revenue-table ::ng-deep .mat-cell {
+  color: rgba(255, 255, 255, 0.87);
+  border-bottom: 1px solid #333;
+}
+
+.growth-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.growth-indicator.positive {
+  color: #43e97b;
+}
+
+.growth-indicator.negative {
+  color: #f5576c;
+}
+
+.growth-indicator mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Student Engagement */
+.engagement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.engagement-card {
+  background: #2a2a2a !important;
+  border-radius: 12px !important;
+  transition: transform 0.3s ease;
+}
+
+.engagement-card:hover {
+  transform: translateY(-2px);
+}
+
+.engagement-card ::ng-deep .mat-card-header {
+  padding-bottom: 16px;
+}
+
+.engagement-card ::ng-deep .mat-card-title {
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.engagement-card ::ng-deep .mat-card-title mat-icon {
+  color: #667eea;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.engagement-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.engagement-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .tab-content {
+    padding: 20px;
+  }
+  
+  .revenue-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .engagement-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .course-performance-table,
+  .revenue-table {
+    font-size: 0.9rem;
+  }
+  
+  .course-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+  }
+  
+  .revenue-amount,
+  .engagement-value {
+    font-size: 1.8rem;
+  }
+} 

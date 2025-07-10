@@ -46,6 +46,10 @@ export const routes: Routes = [
       { 
         path: 'courses/:id/edit', 
         loadComponent: () => import('./features/teacher/course-builder/course-builder.component').then(c => c.CourseBuilderComponent)
+      },
+      { 
+        path: 'analytics', 
+        loadComponent: () => import('./features/teacher/analytics/teacher-analytics.component').then(c => c.TeacherAnalyticsComponent)
       }
     ]
   },

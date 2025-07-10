@@ -29,6 +29,7 @@ export class CourseCardComponent {
   @Input({ required: true }) course!: Course;
   @Input() enrolled: boolean = false;
   @Input() showStartLearningBtn: boolean = false;
+  @Input() viewMode: 'grid' | 'list' = 'grid';
   @Output() startLearning = new EventEmitter<string | number>();
 
   constructor(private router: Router, private cartService: CartService, private snackBar: MatSnackBar) {}

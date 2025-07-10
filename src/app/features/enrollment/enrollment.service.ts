@@ -20,8 +20,8 @@ export class EnrollmentService {
   }
 
   getMyEnrollments(pageNumber: number = 1, pageSize: number = 10) {
-    return this.http.get<any>(`${this.apiUrl}/enrollments`, {
-      params: { PageNumber: pageNumber, PageSize: pageSize }
+    return this.http.get<any>(`${this.apiUrl}/enrollments/user`, {
+      params: { pageNumber: pageNumber, pageSize: pageSize }
     });
   }
 } 

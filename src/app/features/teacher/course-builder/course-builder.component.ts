@@ -521,7 +521,7 @@ export class CourseBuilderComponent implements OnInit, OnDestroy {
                         duration: 3000,
                     });
                     this.isLoading = false;
-                    this.router.navigate(['/teacher/dashboard']);
+                    this.router.navigate(['/teacher/courses']);
                 },
                 error: (error) => {
                     console.error('Unexpected error:', error);
