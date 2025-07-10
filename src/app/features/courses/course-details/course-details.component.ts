@@ -12,6 +12,8 @@ import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
 import { CartService } from '../cart.service';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -37,6 +39,8 @@ import { RatingSummaryComponent } from '../components/rating-summary/rating-summ
     MatChipsModule,
     MatExpansionModule,
     MatIconModule,
+    MatProgressSpinnerModule,
+    MatDividerModule,
     LoaderComponent,
     MatSnackBarModule,
     // Rating components
@@ -88,6 +92,11 @@ export class CourseDetailsComponent implements OnInit {
   showAddRating = false;
   averageRating = 0;
   totalRatings = 0;
+
+  getSectionDuration(sectionId: number): number {
+    const lectures = this.lecturesBySection[sectionId] || [];
+    return lectures.reduce((total, lecture) => total + (lecture.durationInMinutes || 0), 0);
+  }
 
   ngOnInit() {
     this.checkMobile();
