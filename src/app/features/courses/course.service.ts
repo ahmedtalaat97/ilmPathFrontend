@@ -146,13 +146,21 @@ export class CourseService {
 
   private apiUrl = environment.apiUrl; 
 
-  getCourses(pageNumber: number = 1, pageSize: number = 10, categoryId?: number | null): Observable<PagedResult<Course>> {
+  getCourses(pageNumber: number = 1, pageSize: number = 10, categoryId?: number | null, searchQuery?: string | null): Observable<PagedResult<Course>> {
     let url: string;
+    let params = new URLSearchParams();
+    
+    params.append('PageNumber', pageNumber.toString());
+    params.append('PageSize', pageSize.toString());
+    
+    if (searchQuery && searchQuery.trim()) {
+      params.append('SearchQuery', searchQuery.trim());
+    }
     
     if (categoryId) {
-      url = `${this.apiUrl}/Courses/category?CategoryId=${categoryId}&PageNumber=${pageNumber}&PageSize=${pageSize}`;
+      url = `${this.apiUrl}/Courses/category?CategoryId=${categoryId}&${params.toString()}`;
     } else {
-      url = `${this.apiUrl}/Courses?PageNumber=${pageNumber}&PageSize=${pageSize}`;
+      url = `${this.apiUrl}/Courses?${params.toString()}`;
     }
     
     console.log('Making API request to:', url);

@@ -1,34 +1,228 @@
-<div class="page-container" [@fadeInOut]>
-    <h2 class="page-title">Courses to get you started</h2>
-    
-    <!-- Category Filter Indicator -->
-    <div class="category-filter" *ngIf="selectedCategoryId">
-      <mat-chip color="accent" selected>
-        <mat-icon>filter_list</mat-icon>
-        Category Filter Active
-        <button mat-icon-button (click)="clearCategoryFilter()" class="clear-filter-btn">
-          <mat-icon>close</mat-icon>
+<div class="course-marketplace" [@fadeInOut]>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">Expand Your Knowledge</h1>
+      <p class="hero-subtitle">Discover thousands of courses from expert instructors</p>
+      
+      <!-- Search Bar -->
+      <div class="search-container">
+        <mat-form-field class="search-field" appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput 
+                 placeholder="What do you want to learn?" 
+                 [(ngModel)]="searchQuery"
+                 (input)="onSearchChange($event)"
+                 (keyup.enter)="performSearch()">
+          <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="search-btn" (click)="performSearch()">
+          Search
         </button>
-      </mat-chip>
-    </div>
-  
-    <app-loader *ngIf="loading"></app-loader>
-    <ng-container *ngIf="!loading">
-      <div class="course-grid" *ngIf="courses.length > 0; else noCourses">
-        <app-course-card *ngFor="let course of courses" [course]="course" [enrolled]="isUserEnrolled(course.id)"></app-course-card>
       </div>
-      <mat-paginator
-        style="margin-top: 32px;"
-        [length]="totalCourses"
-        [pageIndex]="pageIndex"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[4, 8, 16, 24]"
-        (page)="onPageChange($event)"
+    </div>
+  </section>
+
+  <!-- Quick Category Filters -->
+  <section class="quick-filters" *ngIf="!searchQuery">
+    <div class="container">
+      <h3>Popular Categories</h3>
+      <div class="category-chips">
+        <mat-chip-listbox>
+          <mat-chip *ngFor="let category of popularCategories" 
+                   [class.selected]="selectedCategoryId === category.id"
+                   (click)="filterByCategory(category.id)">
+            <mat-icon>{{ category.icon }}</mat-icon>
+            {{ category.name }}
+          </mat-chip>
+        </mat-chip-listbox>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters and Controls -->
+  <section class="filters-section">
+    <div class="container">
+      <div class="filters-header">
+        <div class="results-info">
+          <h2 *ngIf="!searchQuery && !selectedCategoryId">All Courses</h2>
+          <h2 *ngIf="searchQuery">Search Results for "{{ searchQuery }}"</h2>
+          <h2 *ngIf="selectedCategoryId && !searchQuery">{{ getCategoryName(selectedCategoryId) }} Courses</h2>
+          <span class="course-count">({{ totalCourses }} courses found)</span>
+        </div>
         
-        showFirstLastButtons>
-      </mat-paginator>
-      <ng-template #noCourses>
-        <p>Loading courses...</p>
-      </ng-template>
-    </ng-container>
-  </div>
+        <div class="filter-controls">
+          <!-- Sort Dropdown -->
+          <mat-form-field appearance="outline" class="sort-field">
+            <mat-label>Sort by</mat-label>
+            <mat-select [(value)]="sortBy" (selectionChange)="onSortChange()">
+              <mat-option value="popular">Most Popular</mat-option>
+              <mat-option value="newest">Newest</mat-option>
+              <mat-option value="price-low">Price: Low to High</mat-option>
+              <mat-option value="price-high">Price: High to Low</mat-option>
+              <mat-option value="rating">Highest Rated</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- View Toggle -->
+          <div class="view-toggle">
+            <button mat-icon-button 
+                    [class.active]="viewMode === 'grid'"
+                    (click)="setViewMode('grid')"
+                    matTooltip="Grid View">
+              <mat-icon>grid_view</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    [class.active]="viewMode === 'list'"
+                    (click)="setViewMode('list')"
+                    matTooltip="List View">
+              <mat-icon>view_list</mat-icon>
+            </button>
+          </div>
+
+          <!-- Advanced Filters Toggle -->
+          <button mat-stroked-button (click)="toggleFilters()" class="filter-btn">
+            <mat-icon>tune</mat-icon>
+            Filters
+            <mat-icon>{{ showFilters ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Advanced Filters Panel -->
+      <div class="advanced-filters" *ngIf="showFilters" [@slideInOut]>
+        <div class="filter-row">
+          <!-- Price Range -->
+          <div class="filter-group">
+            <label>Price Range</label>
+            <mat-slider class="price-slider" 
+                       [min]="0" 
+                       [max]="500" 
+                       [step]="10"
+                       [(ngModel)]="priceRange">
+            </mat-slider>
+            <div class="price-labels">
+              <span>Free</span>
+              <span>${{ priceRange }}</span>
+            </div>
+          </div>
+
+          <!-- Difficulty Level -->
+          <div class="filter-group">
+            <label>Difficulty</label>
+            <mat-chip-listbox [(ngModel)]="selectedDifficulty">
+              <mat-chip *ngFor="let level of difficultyLevels" [value]="level">
+                {{ level }}
+              </mat-chip>
+            </mat-chip-listbox>
+          </div>
+
+          <!-- Duration -->
+          <div class="filter-group">
+            <label>Duration</label>
+            <mat-chip-listbox [(ngModel)]="selectedDuration">
+              <mat-chip value="short">0-2 hours</mat-chip>
+              <mat-chip value="medium">3-6 hours</mat-chip>
+              <mat-chip value="long">7+ hours</mat-chip>
+            </mat-chip-listbox>
+          </div>
+        </div>
+        
+        <div class="filter-actions">
+          <button mat-button (click)="clearAllFilters()">Clear All</button>
+          <button mat-raised-button color="primary" (click)="applyFilters()">Apply Filters</button>
+        </div>
+      </div>
+
+      <!-- Active Filters -->
+      <div class="active-filters" *ngIf="hasActiveFilters()">
+        <span class="filter-label">Active filters:</span>
+        <mat-chip *ngIf="selectedCategoryId" (removed)="removeFilter('category')">
+          {{ getCategoryName(selectedCategoryId) }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <mat-chip *ngIf="searchQuery" (removed)="removeFilter('search')">
+          "{{ searchQuery }}"
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <mat-chip *ngIf="selectedDifficulty" (removed)="removeFilter('difficulty')">
+          {{ selectedDifficulty }}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <button mat-button class="clear-all-btn" (click)="clearAllFilters()">Clear All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Course Content -->
+  <section class="courses-section">
+    <div class="container">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-container">
+        <div class="course-skeletons">
+          <div class="skeleton-card" *ngFor="let item of [1,2,3,4,5,6,7,8]">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-title"></div>
+              <div class="skeleton-line skeleton-instructor"></div>
+              <div class="skeleton-line skeleton-price"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Courses Grid/List -->
+      <ng-container *ngIf="!loading">
+        <!-- No Results -->
+        <div *ngIf="courses.length === 0" class="no-results">
+          <mat-icon class="no-results-icon">search_off</mat-icon>
+          <h3>No courses found</h3>
+          <p>Try adjusting your search criteria or browse our popular categories</p>
+          <button mat-raised-button color="primary" (click)="clearAllFilters()">
+            Browse All Courses
+          </button>
+        </div>
+
+        <!-- Course Grid -->
+        <div *ngIf="courses.length > 0" 
+             class="course-grid" 
+             [class.list-view]="viewMode === 'list'"
+             [class.grid-view]="viewMode === 'grid'">
+          <app-course-card 
+            *ngFor="let course of courses; trackBy: trackByFn" 
+            [course]="course" 
+            [enrolled]="isUserEnrolled(course.id)"
+            [viewMode]="viewMode">
+          </app-course-card>
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator
+          *ngIf="courses.length > 0"
+          class="course-paginator"
+          [length]="totalCourses"
+          [pageIndex]="pageIndex"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[8, 16, 24, 48]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </ng-container>
+    </div>
+  </section>
+
+  <!-- Call to Action Section -->
+  <section class="cta-section" *ngIf="!loading && courses.length > 0">
+    <div class="container">
+      <div class="cta-content">
+        <h3>Ready to become an instructor?</h3>
+        <p>Share your knowledge with thousands of students worldwide</p>
+        <button mat-raised-button color="accent" routerLink="/teacher">
+          Start Teaching
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
