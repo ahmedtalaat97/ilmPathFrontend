@@ -1,0 +1,175 @@
+<div class="admin-withdrawal-requests">
+  <!-- Dashboard Stats -->
+  <div class="stats-grid" *ngIf="stats">
+    <mat-card class="stat-card pending">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.pendingRequestsCount }}</div>
+          <div class="stat-label">Pending Requests</div>
+          <div class="stat-amount">${{ stats.totalPendingAmount | number:'1.2-2' }}</div>
+        </div>
+        <mat-icon>hourglass_empty</mat-icon>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card approved">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.approvedRequestsCount }}</div>
+          <div class="stat-label">Approved Requests</div>
+          <div class="stat-amount">${{ stats.totalApprovedAmount | number:'1.2-2' }}</div>
+        </div>
+        <mat-icon>check_circle</mat-icon>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card completed">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.completedRequestsCount }}</div>
+          <div class="stat-label">Completed Payouts</div>
+          <div class="stat-amount">${{ stats.totalCompletedAmount | number:'1.2-2' }}</div>
+        </div>
+        <mat-icon>payments</mat-icon>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card rejected">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.rejectedRequestsCount }}</div>
+          <div class="stat-label">Rejected Requests</div>
+        </div>
+        <mat-icon>cancel</mat-icon>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Withdrawal Requests Table -->
+  <mat-card class="requests-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>request_quote</mat-icon>
+        Withdrawal Requests
+      </mat-card-title>
+      
+      <div class="header-actions">
+        <mat-form-field appearance="outline">
+          <mat-label>Filter by Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilterChange()">
+            <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="requests" class="requests-table">
+          
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Request ID</th>
+            <td mat-cell *matCellDef="let request">#{{ request.id }}</td>
+          </ng-container>
+
+          <!-- Instructor Column -->
+          <ng-container matColumnDef="instructor">
+            <th mat-header-cell *matHeaderCellDef>Instructor</th>
+            <td mat-cell *matCellDef="let request">
+              <div class="instructor-cell">
+                <div class="instructor-name">{{ request.instructorName }}</div>
+                <div class="instructor-email">{{ request.instructorEmail }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let request">
+              <div class="amount-cell">
+                <div class="net-amount">${{ request.netAmount | number:'1.2-2' }}</div>
+                <div class="gross-amount">of ${{ request.grossAmount | number:'1.2-2' }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let request">
+              <mat-chip [color]="getStatusColor(request.status)">
+                {{ request.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Enrollments Column -->
+          <ng-container matColumnDef="enrollments">
+            <th mat-header-cell *matHeaderCellDef>Enrollments</th>
+            <td mat-cell *matCellDef="let request">{{ request.enrollmentsCount }}</td>
+          </ng-container>
+
+          <!-- Request Date Column -->
+          <ng-container matColumnDef="requestDate">
+            <th mat-header-cell *matHeaderCellDef>Requested</th>
+            <td mat-cell *matCellDef="let request">{{ request.requestDate | date:'short' }}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let request">
+              <div class="action-buttons">
+                <button 
+                  mat-icon-button 
+                  matTooltip="View Details" 
+                  (click)="viewDetails(request)">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  matTooltip="Quick Approve" 
+                  (click)="quickApprove(request)"
+                  *ngIf="request.status === 'Pending'">
+                  <mat-icon>check</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="request-row"></tr>
+          
+        </table>
+
+        <!-- No data message -->
+        <div class="no-data" *ngIf="requests.length === 0 && !loading">
+          <mat-icon>inbox</mat-icon>
+          <p>No withdrawal requests found.</p>
+          <p *ngIf="selectedStatus">Try changing the status filter.</p>
+        </div>
+
+        <!-- Loading indicator -->
+        <div class="loading" *ngIf="loading">
+          <p>Loading withdrawal requests...</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator
+        *ngIf="totalItems > 0"
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div> 
