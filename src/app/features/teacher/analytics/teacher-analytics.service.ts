@@ -7,10 +7,20 @@ export interface EnrollmentAnalytics {
   id: number;
   userId: string;
   courseId: number;
-  enrollmentDate: string;
+  enrollmentDate: Date;
   pricePaid: number;
-  courseName?: string;
-  userName?: string;
+  user?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profileImageUrl?: string;
+  };
+  course?: {
+    id: number;
+    title: string;
+    thumbnailImageUrl?: string;
+  };
 }
 
 export interface RevenueAnalytics {

@@ -50,6 +50,14 @@ export const routes: Routes = [
       { 
         path: 'analytics', 
         loadComponent: () => import('./features/teacher/analytics/teacher-analytics.component').then(c => c.TeacherAnalyticsComponent)
+      },
+      { 
+        path: 'students', 
+        loadComponent: () => import('./features/teacher/students/teacher-students.component').then(c => c.TeacherStudentsComponent)
+      },
+      { 
+        path: 'settings', 
+        loadComponent: () => import('./features/teacher/settings/teacher-settings.component').then(c => c.TeacherSettingsComponent)
       }
     ]
   },
