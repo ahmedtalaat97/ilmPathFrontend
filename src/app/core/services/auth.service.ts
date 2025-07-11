@@ -133,6 +133,10 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  updateCurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
+  }
+
   isTokenExpired(): boolean {
     const expiration = localStorage.getItem(this.tokenExpirationKey);
     if (!expiration) return true;

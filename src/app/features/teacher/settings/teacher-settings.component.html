@@ -1,0 +1,256 @@
+<div class="teacher-settings">
+  <div class="settings-header mb-4">
+    <h1 class="mb-1">
+      <i class="fas fa-cog text-primary me-2"></i>
+      Settings
+    </h1>
+    <p class="text-muted mb-0">Manage your account and preferences</p>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <!-- Profile Settings -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Profile Information</h5>
+        </div>
+        <div class="card-body">
+          <!-- Profile Image Section -->
+          <div class="profile-image-section mb-4">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="profile-image-container">
+                  <div class="current-image">
+                    @if (profileImagePreview) {
+                      <img [src]="profileImagePreview" alt="Profile Image" class="profile-image">
+                    } @else {
+                      <div class="profile-placeholder">
+                        <i class="fas fa-user"></i>
+                      </div>
+                    }
+                  </div>
+                  <div class="image-overlay">
+                    <i class="fas fa-camera"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <h6>Profile Picture</h6>
+                <p class="text-muted mb-3">Upload a professional photo that represents you. This will be visible to students and in your instructor profile.</p>
+                
+                <div class="image-upload-controls">
+                  <input type="file" 
+                         id="profileImageInput" 
+                         accept="image/*" 
+                         (change)="onProfileImageSelected($event)"
+                         class="d-none">
+                  
+                  <div class="btn-group">
+                    <label for="profileImageInput" class="btn btn-outline-primary">
+                      <i class="fas fa-upload me-2"></i>
+                      Choose Image
+                    </label>
+                    
+                    @if (profileImageFile) {
+                      <button type="button" 
+                              class="btn btn-primary" 
+                              (click)="uploadProfileImage()"
+                              [disabled]="uploadingImage">
+                        @if (uploadingImage) {
+                          <span class="spinner-border spinner-border-sm me-2"></span>
+                          Uploading...
+                        } @else {
+                          <i class="fas fa-save me-2"></i>
+                          Save Image
+                        }
+                      </button>
+                    }
+                    
+                    @if (profileImagePreview) {
+                      <button type="button" 
+                              class="btn btn-outline-danger" 
+                              (click)="removeProfileImage()">
+                        <i class="fas fa-trash me-2"></i>
+                        Remove
+                      </button>
+                    }
+                  </div>
+                </div>
+                
+                <small class="form-text text-muted">
+                  Supported formats: JPEG, PNG, WebP. Maximum file size: 5MB.
+                </small>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Basic Profile Information -->
+          <form (ngSubmit)="saveSettings()">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="settings.profile.firstName" name="firstName">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="settings.profile.lastName" name="lastName">
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" [(ngModel)]="settings.profile.email" name="email">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Bio</label>
+              <textarea class="form-control" rows="3" [(ngModel)]="settings.profile.bio" name="bio" placeholder="Tell us about yourself..."></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Website</label>
+                  <input type="url" class="form-control" [(ngModel)]="settings.profile.website" name="website" placeholder="https://yourwebsite.com">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">LinkedIn</label>
+                  <input type="url" class="form-control" [(ngModel)]="settings.profile.linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Notification Settings -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Notification Preferences</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="settings.notifications.emailNotifications" id="emailNotifications">
+            <label class="form-check-label" for="emailNotifications">
+              Email Notifications
+            </label>
+            <small class="form-text text-muted d-block">Receive general email notifications</small>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="settings.notifications.newEnrollments" id="newEnrollments">
+            <label class="form-check-label" for="newEnrollments">
+              New Enrollments
+            </label>
+            <small class="form-text text-muted d-block">Get notified when students enroll in your courses</small>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="settings.notifications.courseUpdates" id="courseUpdates">
+            <label class="form-check-label" for="courseUpdates">
+              Course Updates
+            </label>
+            <small class="form-text text-muted d-block">Notifications about course-related updates</small>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="settings.notifications.paymentAlerts" id="paymentAlerts">
+            <label class="form-check-label" for="paymentAlerts">
+              Payment Alerts
+            </label>
+            <small class="form-text text-muted d-block">Get notified about payments and earnings</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Preferences</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Timezone</label>
+                <select class="form-select" [(ngModel)]="settings.preferences.timezone" name="timezone">
+                  <option value="UTC">UTC</option>
+                  <option value="EST">Eastern Time</option>
+                  <option value="PST">Pacific Time</option>
+                  <option value="GMT">Greenwich Mean Time</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Currency</label>
+                <select class="form-select" [(ngModel)]="settings.preferences.currency" name="currency">
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="JPY">JPY (¥)</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Language</label>
+                <select class="form-select" [(ngModel)]="settings.preferences.language" name="language">
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <!-- Quick Actions -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary" (click)="saveSettings()" [disabled]="loading">
+              <i class="fas fa-save me-2"></i>
+              <span *ngIf="!loading">Save Settings</span>
+              <span *ngIf="loading">Saving...</span>
+            </button>
+            <button class="btn btn-outline-secondary" (click)="resetSettings()">
+              <i class="fas fa-undo me-2"></i>
+              Reset to Default
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Info -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5 class="mb-0">Account Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong>Account Type:</strong>
+            <span class="badge bg-success ms-2">Instructor</span>
+          </div>
+          <div class="mb-3">
+            <strong>Member Since:</strong>
+            <div class="text-muted">January 2024</div>
+          </div>
+          <div class="mb-3">
+            <strong>Account Status:</strong>
+            <span class="badge bg-success ms-2">Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

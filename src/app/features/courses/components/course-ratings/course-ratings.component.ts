@@ -5,6 +5,7 @@ import { RatingService } from '../../rating.service';
 import { CourseRating, GetCourseRatingsQuery } from '../../../../shared/models/rating.model';
 import { PagedResult } from '../../../../shared/models/paged-result.model';
 import { RatingDisplayComponent } from '../../../../shared/components/rating-display/rating-display.component';
+import { ImageUrlUtil } from '../../../../core/utils/image-url.util';
 
 @Component({
   selector: 'app-course-ratings',
@@ -31,7 +32,7 @@ import { RatingDisplayComponent } from '../../../../shared/components/rating-dis
           <div class="rating-header">
             <div class="user-info">
               <img 
-                [src]="rating.userProfileImageUrl || '/assets/default-avatar.png'" 
+                [src]="ImageUrlUtil.getProfileImageUrl(rating.userProfileImageUrl)" 
                 [alt]="rating.userName"
                 class="user-avatar"
                 (error)="onImageError($event)"
@@ -259,6 +260,9 @@ import { RatingDisplayComponent } from '../../../../shared/components/rating-dis
 })
 export class CourseRatingsComponent implements OnInit {
   @Input() courseId!: number;
+
+  // Make ImageUrlUtil accessible in template
+  ImageUrlUtil = ImageUrlUtil;
 
   ratings: CourseRating[] = [];
   loading = false;

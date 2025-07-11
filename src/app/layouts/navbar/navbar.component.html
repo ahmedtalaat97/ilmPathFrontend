@@ -49,7 +49,14 @@
       </button>
       
       <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
-        <mat-icon>account_circle</mat-icon>
+        <div class="profile-avatar">
+          <img 
+            *ngIf="getProfileImageUrl()" 
+            [src]="getProfileImageUrl()" 
+            [alt]="getUserDisplayName()"
+            class="profile-image">
+          <mat-icon *ngIf="!getProfileImageUrl()">account_circle</mat-icon>
+        </div>
       </button>
       
       <span class="user-name">{{ getUserDisplayName() }}</span>
@@ -69,8 +76,18 @@
   <!-- User Menu -->
   <mat-menu #userMenu="matMenu">
     <div class="user-info">
-      <div class="user-name-menu">{{ getUserDisplayName() }}</div>
-      <div class="user-email">{{ currentUser?.email }}</div>
+      <div class="user-avatar-menu">
+        <img 
+          *ngIf="getProfileImageUrl()" 
+          [src]="getProfileImageUrl()" 
+          [alt]="getUserDisplayName()"
+          class="user-menu-image">
+        <mat-icon *ngIf="!getProfileImageUrl()" class="default-avatar-menu">account_circle</mat-icon>
+      </div>
+      <div class="user-details">
+        <div class="user-name-menu">{{ getUserDisplayName() }}</div>
+        <div class="user-email">{{ currentUser?.email }}</div>
+      </div>
     </div>
     <mat-divider></mat-divider>
     <button mat-menu-item>
@@ -90,7 +107,7 @@
       <span>Wishlist</span>
     </button>
     <mat-divider></mat-divider>
-    <button mat-menu-item>
+    <button mat-menu-item routerLink="/settings">
       <mat-icon>settings</mat-icon>
       <span>Settings</span>
     </button>
