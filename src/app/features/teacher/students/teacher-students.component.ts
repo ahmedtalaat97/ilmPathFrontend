@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { TeacherAnalyticsService } from '../analytics/teacher-analytics.service';
+import { environment } from '../../../../environments/environment';
+import { ImageUrlUtil } from '../../../core/utils/image-url.util';
 
 interface StudentEnrollment {
   id: number;
@@ -81,6 +83,9 @@ export class TeacherStudentsComponent implements OnInit {
   selectedCourse = 'all';
   dateRange = '30'; // days
   
+  // Make ImageUrlUtil accessible in template
+  ImageUrlUtil = ImageUrlUtil;
+
   constructor(
     private authService: AuthService,
     private analyticsService: TeacherAnalyticsService

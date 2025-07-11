@@ -80,6 +80,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/courses/my-courses/my-courses.component').then(c => c.MyCoursesComponent),
     canActivate: [AuthGuard]
   },
+  { 
+    path: 'settings', 
+    loadComponent: () => import('./features/teacher/settings/teacher-settings.component').then(c => c.TeacherSettingsComponent),
+    canActivate: [AuthGuard]
+  },
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
   { path: '**', redirectTo: 'landing' } // Wildcard route for 404 pages
 ]; 

@@ -279,7 +279,7 @@
                           <div class="d-flex align-items-center">
                             <div class="avatar-circle me-3">
                               @if (student.profileImageUrl) {
-                                <img [src]="student.profileImageUrl" 
+                                <img [src]="ImageUrlUtil.getFullImageUrl(student.profileImageUrl)"
                                      [alt]="getStudentDisplayName(student)"
                                      class="rounded-circle">
                               } @else {
@@ -379,7 +379,7 @@
                           <div class="d-flex align-items-center">
                             <div class="avatar-circle me-3">
                               @if (enrollment.user?.profileImageUrl) {
-                                <img [src]="enrollment.user?.profileImageUrl" 
+                                <img [src]="ImageUrlUtil.getFullImageUrl(enrollment.user?.profileImageUrl)"
                                      [alt]="(enrollment.user?.firstName || '') + ' ' + (enrollment.user?.lastName || '')"
                                      class="rounded-circle">
                               } @else {

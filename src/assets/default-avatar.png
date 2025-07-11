@@ -1,0 +1,3 @@
+# This is a placeholder for the default avatar image
+# In a real application, this would be an actual PNG image file
+# For now, we'll use a data URL or fallback to a placeholder div 

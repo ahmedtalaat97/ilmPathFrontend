@@ -15,6 +15,78 @@
           <h5 class="mb-0">Profile Information</h5>
         </div>
         <div class="card-body">
+          <!-- Profile Image Section -->
+          <div class="profile-image-section mb-4">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="profile-image-container">
+                  <div class="current-image">
+                    @if (profileImagePreview) {
+                      <img [src]="profileImagePreview" alt="Profile Image" class="profile-image">
+                    } @else {
+                      <div class="profile-placeholder">
+                        <i class="fas fa-user"></i>
+                      </div>
+                    }
+                  </div>
+                  <div class="image-overlay">
+                    <i class="fas fa-camera"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <h6>Profile Picture</h6>
+                <p class="text-muted mb-3">Upload a professional photo that represents you. This will be visible to students and in your instructor profile.</p>
+                
+                <div class="image-upload-controls">
+                  <input type="file" 
+                         id="profileImageInput" 
+                         accept="image/*" 
+                         (change)="onProfileImageSelected($event)"
+                         class="d-none">
+                  
+                  <div class="btn-group">
+                    <label for="profileImageInput" class="btn btn-outline-primary">
+                      <i class="fas fa-upload me-2"></i>
+                      Choose Image
+                    </label>
+                    
+                    @if (profileImageFile) {
+                      <button type="button" 
+                              class="btn btn-primary" 
+                              (click)="uploadProfileImage()"
+                              [disabled]="uploadingImage">
+                        @if (uploadingImage) {
+                          <span class="spinner-border spinner-border-sm me-2"></span>
+                          Uploading...
+                        } @else {
+                          <i class="fas fa-save me-2"></i>
+                          Save Image
+                        }
+                      </button>
+                    }
+                    
+                    @if (profileImagePreview) {
+                      <button type="button" 
+                              class="btn btn-outline-danger" 
+                              (click)="removeProfileImage()">
+                        <i class="fas fa-trash me-2"></i>
+                        Remove
+                      </button>
+                    }
+                  </div>
+                </div>
+                
+                <small class="form-text text-muted">
+                  Supported formats: JPEG, PNG, WebP. Maximum file size: 5MB.
+                </small>
+              </div>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Basic Profile Information -->
           <form (ngSubmit)="saveSettings()">
             <div class="row">
               <div class="col-md-6">
