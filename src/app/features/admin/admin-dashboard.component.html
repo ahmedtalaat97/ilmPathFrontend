@@ -1,0 +1,90 @@
+<div class="admin-dashboard-container">
+  <!-- Admin Shortcuts -->
+  <div class="admin-shortcuts">
+    <button mat-raised-button color="primary" routerLink="/admin/users" type="button">
+      <mat-icon>people</mat-icon>
+      Manage Users
+    </button>
+    <button mat-raised-button color="accent" routerLink="/admin/courses">
+      <mat-icon>library_books</mat-icon>
+      Manage Courses
+    </button>
+    <button mat-raised-button color="warn" routerLink="/admin/categories">
+      <mat-icon>category</mat-icon>
+      Manage Categories
+    </button>
+    <button mat-raised-button color="primary" routerLink="/admin/reports">
+      <mat-icon>bar_chart</mat-icon>
+      Reports
+    </button>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid" *ngIf="dashboardStats">
+    <mat-card class="stat-card users">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ dashboardStats.totalUsers }}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <mat-icon>group</mat-icon>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card teachers">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ dashboardStats.totalTeachers }}</div>
+          <div class="stat-label">Total Teachers</div>
+        </div>
+        <mat-icon>school</mat-icon>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card admins">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">{{ dashboardStats.totalAdmins }}</div>
+          <div class="stat-label">Total Admins</div>
+        </div>
+        <mat-icon>admin_panel_settings</mat-icon>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stat-card revenue">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-number">${{ dashboardStats.totalRevenue | number:'1.2-2' }}</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+        <mat-icon>attach_money</mat-icon>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <mat-card class="chart-card">
+      <mat-card-title>User Roles Distribution</mat-card-title>
+      <div class="chart-wrapper">
+        <canvas baseChart
+          [data]="pieChartData"
+          [labels]="pieChartLabels"
+          [type]="pieChartType"
+          [options]="pieChartOptions">
+        </canvas>
+      </div>
+    </mat-card>
+    <mat-card class="chart-card">
+      <mat-card-title>Course Categories</mat-card-title>
+      <div class="chart-wrapper">
+        <canvas baseChart
+          [data]="doughnutChartData"
+          [labels]="doughnutChartLabels"
+          [type]="doughnutChartType"
+          [options]="doughnutChartOptions">
+        </canvas>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Withdrawal Requests Section -->
+  <app-admin-withdrawal-requests></app-admin-withdrawal-requests>
+</div> 

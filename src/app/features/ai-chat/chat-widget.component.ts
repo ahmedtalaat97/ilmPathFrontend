@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AiChatService } from './ai-chat.service';
+import { AiChatService, ChatResponse } from './ai-chat.service';
 
 
 @Component({
@@ -23,19 +23,24 @@ export class ChatWidgetComponent {
     this.isOpen = !this.isOpen;
   }
 
-  sendMessage() {
+  async sendMessage() {
     if (this.message.trim()) {
       const userMsg = this.message;
       this.chatHistory.push({ from: 'user', text: userMsg });
       this.isLoading = true;
-      this.aiChatService.sendMessage({ message: userMsg }).subscribe(response => {
-        this.chatHistory.push({ from: 'ai', text: response.message });
-        this.isLoading = false;
-      }, () => {
+      
+      try {
+        const chatObservable = await this.aiChatService.sendMessage({ message: userMsg });
+        chatObservable.subscribe((response: ChatResponse) => {
+          this.chatHistory.push({ from: 'ai', text: response.message });
+          this.isLoading = false;
+        });
+      } catch (error) {
         this.chatHistory.push({ from: 'ai', text: 'Sorry, I\'m having trouble connecting right now.' });
         this.isLoading = false;
-      });
+      }
+      
       this.message = '';
     }
   }
-} 
+}

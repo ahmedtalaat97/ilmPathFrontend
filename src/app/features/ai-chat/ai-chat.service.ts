@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { CourseService } from '../courses/course.service';
+import { Course } from '../../shared/models/course.model';
 
 export interface ChatRequest {
   message: string;
@@ -22,18 +24,38 @@ export interface ChatResponse {
 })
 export class AiChatService {
   private apiUrl = environment.apiUrl;
+  private courseListSummary: string | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private courseService: CourseService) { }
 
   /**
-   * Send a message to the AI service
-   * This method can be easily modified to work with different AI providers
+   * Fetch and cache a summary of published courses (title and category)
    */
-  sendMessage(request: ChatRequest): Observable<ChatResponse> {
+  private fetchCourseListSummary(): Promise<string> {
+    if (this.courseListSummary) {
+      return Promise.resolve(this.courseListSummary);
+    }
+    // Fetch first 10 published courses
+    return this.courseService.getCourses(1, 10).toPromise().then(result => {
+      const courses = (result?.items || []) as Course[];
+      if (!courses.length) return '';
+      const summary = courses.map(c => `- "${c.title}" (${c.categoryName || 'General'})`).join('\n');
+      this.courseListSummary = summary;
+      return summary;
+    }).catch(() => '');
+  }
+
+  /**
+   * Send a message to the AI service, including the course list in the system prompt
+   */
+  async sendMessage(request: ChatRequest): Promise<Observable<ChatResponse>> {
+    const courseList = await this.fetchCourseListSummary();
+    const systemPrompt =
+      `You are an AI assistant for the IlmPath e-learning platform. Only answer questions about IlmPath, its features, its courses, and its instructors. Here is a list of available courses:\n${courseList}\nIf a user asks about anything else, politely decline and redirect them to IlmPath topics.`;
     const modelUrl = `${environment.apiUrl}/AiChat`;
     const body = {
-      model: 'baidu/ernie-4.5-21B-a3b', // or your desired model
-      inputs: request.message
+      model: 'baidu/ernie-4.5-21B-a3b',
+      inputs: `${systemPrompt}\nUser: ${request.message}`
     };
     return this.http.post<any>(modelUrl, body).pipe(
       map(response => ({

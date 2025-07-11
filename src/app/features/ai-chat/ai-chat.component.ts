@@ -9,7 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Subject, takeUntil } from 'rxjs';
-import { AiChatService, ChatRequest } from './ai-chat.service';
+import { AiChatService, ChatRequest, ChatResponse } from './ai-chat.service';
 
 export interface ChatMessage {
   id: string;
@@ -109,23 +109,24 @@ export class AiChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       context: 'e-learning platform assistance'
     };
 
-    this.aiChatService.sendMessage(request)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.isTyping = false;
-          if (response.success) {
-            this.addBotMessage(response.message);
-          } else {
+    this.aiChatService.sendMessage(request).then(observable => {
+      observable.pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response: ChatResponse) => {
+            this.isTyping = false;
+            if (response.success) {
+              this.addBotMessage(response.message);
+            } else {
+              this.addBotMessage('Sorry, I\'m having trouble connecting right now. Please try again later.');
+            }
+          },
+          error: (error: unknown) => {
+            console.error('AI Chat Error:', error);
+            this.isTyping = false;
             this.addBotMessage('Sorry, I\'m having trouble connecting right now. Please try again later.');
           }
-        },
-        error: (error) => {
-          console.error('AI Chat Error:', error);
-          this.isTyping = false;
-          this.addBotMessage('Sorry, I\'m having trouble connecting right now. Please try again later.');
-        }
-      });
+        });
+    });
   }
 
   sendQuickResponse(text: string, event?: Event): void {
