@@ -1,0 +1,134 @@
+<div class="reports-container">
+  <mat-card class="date-range-card">
+    <mat-card-title>Date Range</mat-card-title>
+    <mat-card-content>
+      <form class="date-range-form" (ngSubmit)="onDateRangeChange()">
+        <mat-form-field appearance="fill">
+          <mat-label>From</mat-label>
+          <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" name="fromDate" required>
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>To</mat-label>
+          <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" name="toDate" required>
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit">Apply</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Revenue Report -->
+  <mat-card class="report-card">
+    <mat-card-title>Revenue</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="revenueLoading" class="loading-container"><mat-spinner></mat-spinner></div>
+      <div *ngIf="revenueError" class="error-message">{{ revenueError }}</div>
+      <div *ngIf="!revenueLoading && !revenueError">
+        <div class="stat-row">
+          <div class="stat">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value">${{ totalRevenue | number:'1.2-2' }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Payments</span>
+            <span class="stat-value">{{ paymentCount }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- User Growth Report -->
+  <mat-card class="report-card">
+    <mat-card-title>User Growth</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="userGrowthLoading" class="loading-container"><mat-spinner></mat-spinner></div>
+      <div *ngIf="userGrowthError" class="error-message">{{ userGrowthError }}</div>
+      <div *ngIf="!userGrowthLoading && !userGrowthError">
+        <div class="stat-row">
+          <div class="stat">
+            <span class="stat-label">New Users</span>
+            <span class="stat-value">{{ newUsers }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Top Courses Report -->
+  <mat-card class="report-card">
+    <mat-card-title>Top Courses</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="topCoursesLoading" class="loading-container"><mat-spinner></mat-spinner></div>
+      <div *ngIf="topCoursesError" class="error-message">{{ topCoursesError }}</div>
+      <table mat-table [dataSource]="topCourses" *ngIf="!topCoursesLoading && !topCoursesError && topCourses.length">
+        <ng-container matColumnDef="CourseId">
+          <th mat-header-cell *matHeaderCellDef>Course ID</th>
+          <td mat-cell *matCellDef="let c">{{ c.CourseId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="EnrollmentCount">
+          <th mat-header-cell *matHeaderCellDef>Enrollments</th>
+          <td mat-cell *matCellDef="let c">{{ c.EnrollmentCount }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['CourseId', 'EnrollmentCount']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['CourseId', 'EnrollmentCount'];"></tr>
+      </table>
+      <div *ngIf="!topCoursesLoading && !topCoursesError && !topCourses.length" class="empty-state">No data.</div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Instructor Earnings Report -->
+  <mat-card class="report-card">
+    <mat-card-title>Instructor Earnings</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="instructorEarningsLoading" class="loading-container"><mat-spinner></mat-spinner></div>
+      <div *ngIf="instructorEarningsError" class="error-message">{{ instructorEarningsError }}</div>
+      <table mat-table [dataSource]="instructorEarnings" *ngIf="!instructorEarningsLoading && !instructorEarningsError && instructorEarnings.length">
+        <ng-container matColumnDef="InstructorId">
+          <th mat-header-cell *matHeaderCellDef>Instructor ID</th>
+          <td mat-cell *matCellDef="let e">{{ e.InstructorId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="TotalEarnings">
+          <th mat-header-cell *matHeaderCellDef>Total Earnings</th>
+          <td mat-cell *matCellDef="let e">${{ e.TotalEarnings | number:'1.2-2' }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['InstructorId', 'TotalEarnings']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['InstructorId', 'TotalEarnings'];"></tr>
+      </table>
+      <div *ngIf="!instructorEarningsLoading && !instructorEarningsError && !instructorEarnings.length" class="empty-state">No data.</div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Withdrawals Report -->
+  <mat-card class="report-card">
+    <mat-card-title>Withdrawals</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="withdrawalsLoading" class="loading-container"><mat-spinner></mat-spinner></div>
+      <div *ngIf="withdrawalsError" class="error-message">{{ withdrawalsError }}</div>
+      <table mat-table [dataSource]="withdrawals" *ngIf="!withdrawalsLoading && !withdrawalsError && withdrawals.length">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let w">{{ w.id }}</td>
+        </ng-container>
+        <ng-container matColumnDef="InstructorId">
+          <th mat-header-cell *matHeaderCellDef>Instructor ID</th>
+          <td mat-cell *matCellDef="let w">{{ w.InstructorId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="NetAmount">
+          <th mat-header-cell *matHeaderCellDef>Net Amount</th>
+          <td mat-cell *matCellDef="let w">${{ w.NetAmount | number:'1.2-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="PayoutDate">
+          <th mat-header-cell *matHeaderCellDef>Payout Date</th>
+          <td mat-cell *matCellDef="let w">{{ w.PayoutDate | date }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['id', 'InstructorId', 'NetAmount', 'PayoutDate']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['id', 'InstructorId', 'NetAmount', 'PayoutDate'];"></tr>
+      </table>
+      <div *ngIf="!withdrawalsLoading && !withdrawalsError && !withdrawals.length" class="empty-state">No data.</div>
+    </mat-card-content>
+  </mat-card>
+</div> 

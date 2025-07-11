@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { EnrollmentService } from '../../enrollment/enrollment.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { CategoryService, Category as RealCategory } from '../category.service';
 
 interface Category {
   id: number;
@@ -72,7 +73,8 @@ export class CourseListComponent implements OnInit {
     private courseService: CourseService,
     private route: ActivatedRoute,
     private router: Router,
-    private enrollmentService: EnrollmentService
+    private enrollmentService: EnrollmentService,
+    private categoryService: CategoryService
   ) {
     console.log('CourseListComponent initialized');
   }
@@ -100,18 +102,13 @@ export class CourseListComponent implements OnInit {
   difficultyLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
   // Categories
-  popularCategories: Category[] = [
-    { id: 1, name: 'Development', icon: 'code' },
-    { id: 2, name: 'Business', icon: 'business' },
-    { id: 3, name: 'Design', icon: 'palette' },
-    { id: 4, name: 'Marketing', icon: 'campaign' },
-    { id: 5, name: 'Photography', icon: 'camera_alt' },
-    { id: 6, name: 'Music', icon: 'music_note' }
-  ];
-  
+  categories: (Category & { icon: string })[] = [];
+
   ngOnInit(): void {
     console.log('CourseListComponent ngOnInit called');
     
+    // Load real categories
+    this.loadCategories();
     // Load user enrollments
     this.loadUserEnrollments();
     
@@ -192,7 +189,7 @@ export class CourseListComponent implements OnInit {
   }
 
   getCategoryName(categoryId: number): string {
-    const category = this.popularCategories.find(c => c.id === categoryId);
+    const category = this.categories.find(c => c.id === categoryId);
     return category ? category.name : 'Unknown Category';
   }
 
@@ -289,5 +286,34 @@ export class CourseListComponent implements OnInit {
     this.selectedCategoryId = null;
     this.updateUrlParams();
     this.loadCourses();
+  }
+
+  loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (categories: RealCategory[]) => {
+        this.categories = categories.map((cat: RealCategory) => ({
+          ...cat,
+          icon: this.getCategoryIcon(cat.name)
+        }));
+      },
+      error: (err: any) => {
+        console.error('Error loading categories:', err);
+      }
+    });
+  }
+
+  getCategoryIcon(name: string): string {
+    // Map category names to Material icons (customize as needed)
+    const map: { [key: string]: string } = {
+      'Development': 'code',
+      'Business': 'business',
+      'Design': 'palette',
+      'Marketing': 'campaign',
+      'Photography': 'camera_alt',
+      'Music': 'music_note',
+      'Programming': 'terminal',
+      'Other': 'category'
+    };
+    return map[name] || 'category';
   }
 }   

@@ -306,4 +306,10 @@ export class CourseService {
     console.log('Uploading video for lecture:', lectureId);
     return this.http.post<VideoUploadResponse>(url, formData);
   }
+
+  // Delete a course
+  deleteCourse(courseId: string): Observable<void> {
+    const url = `${this.apiUrl}/Courses/${courseId}`;
+    return this.http.delete<void>(url);
+  }
 }

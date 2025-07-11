@@ -1,0 +1,78 @@
+mat-card {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 24px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  color: #666;
+}
+
+.loading-container p {
+  margin-top: 16px;
+}
+
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  color: #f44336;
+}
+
+.error-message mat-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-message button {
+  margin-top: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #888;
+  margin: 48px 0;
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog {
+  background: #fff;
+  border-radius: 8px;
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  max-width: 400px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.dialog-loading {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+} 

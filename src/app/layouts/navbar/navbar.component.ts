@@ -133,4 +133,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   getProfileImageUrl(): string | null {
     return ImageUrlUtil.getProfileImageUrl(this.currentUser?.profileImageUrl);
   }
+
+  get isAdmin(): boolean {
+    return this.currentUser?.roles?.includes('Admin') ?? false;
+  }
 }

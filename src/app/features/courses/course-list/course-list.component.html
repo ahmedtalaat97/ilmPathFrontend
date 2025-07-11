@@ -31,7 +31,7 @@
       <h3>Popular Categories</h3>
       <div class="category-chips">
         <mat-chip-listbox>
-          <mat-chip *ngFor="let category of popularCategories" 
+          <mat-chip *ngFor="let category of categories.slice(0,5)" 
                    [class.selected]="selectedCategoryId === category.id"
                    (click)="filterByCategory(category.id)">
             <mat-icon>{{ category.icon }}</mat-icon>

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { 
@@ -66,9 +67,34 @@ export const routes: Routes = [
     ]
   },
   { 
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin-dashboard.component').then(c => c.AdminDashboardComponent),
+    canActivate: [AdminGuard]
+  },
+  { 
     path: 'admin/withdrawal-requests', 
     loadComponent: () => import('./features/admin/withdrawal-requests/admin-withdrawal-requests.component').then(c => c.AdminWithdrawalRequestsComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AdminGuard]
+  },
+  { 
+    path: 'admin/users',
+    loadComponent: () => import('./features/admin/manage-users/manage-users.component').then(c => c.ManageUsersComponent),
+    canActivate: [AdminGuard]
+  },
+  { 
+    path: 'admin/courses',
+    loadComponent: () => import('./features/admin/manage-courses/manage-courses.component').then(c => c.ManageCoursesComponent),
+    canActivate: [AdminGuard]
+  },
+  { 
+    path: 'admin/categories',
+    loadComponent: () => import('./features/admin/manage-categories/manage-categories.component').then(c => c.ManageCategoriesComponent),
+    canActivate: [AdminGuard]
+  },
+  { 
+    path: 'admin/reports',
+    loadComponent: () => import('./features/admin/reports/admin-reports.component').then(c => c.AdminReportsComponent),
+    canActivate: [AdminGuard]
   },
   { 
     path: 'cart', 
