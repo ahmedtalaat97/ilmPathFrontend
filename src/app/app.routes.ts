@@ -48,6 +48,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/teacher/course-builder/course-builder.component').then(c => c.CourseBuilderComponent)
       },
       { 
+        path: 'payouts', 
+        loadComponent: () => import('./features/teacher/payouts/instructor-payouts.component').then(c => c.InstructorPayoutsComponent)
+      },
+      { 
         path: 'analytics', 
         loadComponent: () => import('./features/teacher/analytics/teacher-analytics.component').then(c => c.TeacherAnalyticsComponent)
       },
@@ -60,6 +64,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/teacher/settings/teacher-settings.component').then(c => c.TeacherSettingsComponent)
       }
     ]
+  },
+  { 
+    path: 'admin/withdrawal-requests', 
+    loadComponent: () => import('./features/admin/withdrawal-requests/admin-withdrawal-requests.component').then(c => c.AdminWithdrawalRequestsComponent),
+    canActivate: [AuthGuard]
   },
   { 
     path: 'cart', 

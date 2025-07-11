@@ -1,0 +1,84 @@
+.withdrawal-summary {
+  margin-bottom: 24px;
+}
+
+.withdrawal-summary h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.amount-breakdown {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.amount-row.commission {
+  color: #f44336;
+}
+
+.amount-row.total {
+  color: #4caf50;
+  font-size: 1.1em;
+}
+
+.amount {
+  font-weight: 500;
+}
+
+.enrollments-info {
+  padding: 12px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  margin: 16px 0;
+}
+
+.enrollments-info p {
+  margin: 0;
+  color: #1976d2;
+}
+
+.form-section {
+  margin: 24px 0;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.warning-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #fff3e0;
+  border-radius: 4px;
+  color: #f57c00;
+  margin: 16px 0;
+}
+
+.warning-notice mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+mat-dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+} 
