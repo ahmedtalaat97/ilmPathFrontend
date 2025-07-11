@@ -1,0 +1,236 @@
+<div class="instructor-payouts">
+  <!-- Stripe Connect Setup (if not connected) -->
+  <mat-card class="stripe-setup-card" *ngIf="!stripeConnectStatus?.isConnected">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>account_balance</mat-icon>
+        Set Up Payouts
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="setup-content">
+        <p>To receive payments from your course sales, you need to connect your Stripe account.</p>
+        <ul>
+          <li>Secure and instant payments</li>
+          <li>Direct deposits to your bank account</li>
+          <li>Professional payout tracking</li>
+        </ul>
+        
+        <!-- Show account creation step if no account exists -->
+        <div class="setup-steps" *ngIf="!stripeConnectStatus?.accountId">
+          <h4>Step 1: Create Stripe Account</h4>
+          <p>First, we'll create a Stripe Connect account for you.</p>
+        </div>
+        
+        <!-- Show onboarding step if account exists but setup incomplete -->
+        <div class="setup-steps" *ngIf="stripeConnectStatus?.accountId && !stripeConnectStatus?.canReceivePayouts">
+          <h4>Step 2: Complete Onboarding</h4>
+          <p>Your Stripe account is created. Now complete the onboarding process.</p>
+        </div>
+      </div>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <!-- Step 1: Create Account Button (shown when no account exists) -->
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="createStripeAccount()"
+        [disabled]="creatingAccount"
+        *ngIf="!stripeConnectStatus?.accountId">
+        <mat-icon>add_circle</mat-icon>
+        <span *ngIf="!creatingAccount">Create Stripe Account</span>
+        <span *ngIf="creatingAccount">Creating account...</span>
+      </button>
+      
+      <!-- Step 2: Start Onboarding Button (shown when account exists but incomplete) -->
+      <button 
+        mat-raised-button 
+        color="accent" 
+        (click)="startOnboarding()"
+        [disabled]="gettingOnboardingLink"
+        *ngIf="stripeConnectStatus?.accountId && !stripeConnectStatus?.canReceivePayouts">
+        <mat-icon>launch</mat-icon>
+        <span *ngIf="!gettingOnboardingLink">Start Onboarding</span>
+        <span *ngIf="gettingOnboardingLink">Loading...</span>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Stripe Dashboard Access (if setup is complete) -->
+  <mat-card class="stripe-dashboard-card" *ngIf="stripeConnectStatus?.isConnected && stripeConnectStatus?.canReceivePayouts">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>dashboard</mat-icon>
+        Stripe Account Management
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <p>Access your Stripe Express dashboard to view detailed payment information, manage payouts, and update your account settings.</p>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="openStripeDashboard()">
+        <mat-icon>launch</mat-icon>
+        Open Stripe Dashboard
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Balance Card -->
+  <mat-card class="balance-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>account_balance_wallet</mat-icon>
+        Earnings & Payouts
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="balance-section">
+        <div class="balance-amount" *ngIf="balance">
+          <h2>${{ balance.pendingBalance | number:'1.2-2' }}</h2>
+          <p>Pending Balance</p>
+        </div>
+        
+        <div class="balance-info">
+          <p class="commission-note">
+            <mat-icon>info</mat-icon>
+            Platform takes 30% commission. You receive 70% of enrollment fees.
+          </p>
+          
+          <div class="unpaid-info" *ngIf="unpaidEnrollments.length > 0">
+            <strong>{{ unpaidEnrollments.length }}</strong> unpaid enrollments
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="requestWithdrawal()"
+        [disabled]="!balance || balance.pendingBalance <= 0 || !stripeConnectStatus?.canReceivePayouts">
+        <mat-icon>request_quote</mat-icon>
+        Request Withdrawal
+      </button>
+      
+      <button 
+        mat-stroked-button 
+        color="accent" 
+        (click)="openStripeDashboard()"
+        *ngIf="stripeConnectStatus?.canReceivePayouts">
+        <mat-icon>dashboard</mat-icon>
+        View Stripe Dashboard
+      </button>
+      
+      <p class="withdrawal-note" *ngIf="!stripeConnectStatus?.canReceivePayouts">
+        <small>Complete Stripe setup to enable withdrawals</small>
+      </p>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Payout History -->
+  <mat-card class="payouts-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>history</mat-icon>
+        Payout History
+      </mat-card-title>
+      <mat-card-subtitle>
+        Payouts are automatically sent to your Stripe account after admin approval
+      </mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="payouts" class="payouts-table">
+          
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Request ID</th>
+            <td mat-cell *matCellDef="let payout">#{{ payout.id }}</td>
+          </ng-container>
+
+          <!-- Net Amount Column -->
+          <ng-container matColumnDef="netAmount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let payout">
+              <div class="amount-cell">
+                <span class="net-amount">${{ payout.netAmount | number:'1.2-2' }}</span>
+                <span class="gross-amount">of ${{ payout.grossAmount | number:'1.2-2' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let payout">
+              <div class="status-cell">
+                <mat-chip [color]="getStatusColor(payout.status)">
+                  {{ payout.status }}
+                </mat-chip>
+                <div class="status-description" *ngIf="getStatusDescription(payout.status) as description">
+                  <small>{{ description }}</small>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Enrollments Column -->
+          <ng-container matColumnDef="enrollments">
+            <th mat-header-cell *matHeaderCellDef>Enrollments</th>
+            <td mat-cell *matCellDef="let payout">{{ payout.enrollmentsCount }}</td>
+          </ng-container>
+
+          <!-- Request Date Column -->
+          <ng-container matColumnDef="requestDate">
+            <th mat-header-cell *matHeaderCellDef>Requested</th>
+            <td mat-cell *matCellDef="let payout">{{ payout.requestDate | date:'short' }}</td>
+          </ng-container>
+
+          <!-- Processed Date Column -->
+          <ng-container matColumnDef="processedDate">
+            <th mat-header-cell *matHeaderCellDef>Processed</th>
+            <td mat-cell *matCellDef="let payout">
+              {{ payout.processedDate ? (payout.processedDate | date:'short') : '-' }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          
+        </table>
+
+        <!-- No data message -->
+        <div class="no-data" *ngIf="payouts.length === 0 && !loading">
+          <mat-icon>receipt_long</mat-icon>
+          <p>No payout requests yet.</p>
+          <p>When you have student enrollments, you can request withdrawals here.</p>
+        </div>
+
+        <!-- Loading indicator -->
+        <div class="loading" *ngIf="loading">
+          <p>Loading payouts...</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator
+        *ngIf="totalItems > 0"
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 25]"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div> 

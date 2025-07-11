@@ -1,0 +1,282 @@
+.instructor-payouts {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stripe-setup-card,
+.stripe-status-card {
+  border-left: 4px solid #1976d2;
+}
+
+.stripe-dashboard-card {
+  border-left: 4px solid #4caf50;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: #ffffff;
+}
+
+.stripe-dashboard-card .mat-card-header .mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4caf50;
+}
+
+.stripe-dashboard-card .mat-card-content {
+  color: #e0e0e0;
+}
+
+.stripe-dashboard-card .mat-card-content p {
+  color: #b0b0b0;
+}
+
+.stripe-dashboard-card .mat-card-actions {
+  border-top: 1px solid #404040;
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.stripe-dashboard-card .mat-card-actions button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.stripe-dashboard-card .mat-card-actions button:hover {
+  background-color: #45a049;
+}
+
+.stripe-setup-card .mat-card-header .mat-card-title,
+.stripe-status-card .mat-card-header .mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setup-content ul {
+  margin: 16px 0;
+  padding-left: 20px;
+}
+
+.setup-content li {
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.setup-steps {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+}
+
+.setup-steps h4 {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.setup-steps p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stripe-status-card {
+  border-left-color: #ff9800;
+}
+
+.withdrawal-note {
+  margin-top: 8px;
+  margin-bottom: 0;
+  color: #666;
+  font-style: italic;
+}
+
+.balance-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.balance-card .mat-card-title,
+.balance-card .mat-card-subtitle,
+.balance-card .mat-card-content {
+  color: white;
+}
+
+.balance-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.balance-amount h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.balance-amount p {
+  margin: 4px 0 0 0;
+  opacity: 0.9;
+}
+
+.balance-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.commission-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.unpaid-info {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.balance-card .mat-card-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.balance-card .mat-card-actions button {
+  flex: 1;
+  min-width: 160px;
+}
+
+@media (max-width: 600px) {
+  .balance-card .mat-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .balance-card .mat-card-actions button {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+.payouts-card .mat-card-header .mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.payouts-table {
+  width: 100%;
+  min-width: 800px;
+}
+
+.amount-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.net-amount {
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.gross-amount {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-description {
+  color: #666;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.no-data,
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .instructor-payouts {
+    padding: 16px;
+  }
+  
+  .balance-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .balance-amount {
+    width: 100%;
+  }
+  
+  .balance-amount h2 {
+    font-size: 2rem;
+  }
+  
+  .table-container {
+    margin: 0 -16px;
+  }
+  
+  .payouts-table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .balance-amount h2 {
+    font-size: 1.8rem;
+  }
+  
+  .payouts-table {
+    min-width: 500px;
+  }
+}
+
+/* Material chip colors */
+mat-chip.mat-accent {
+  background-color: #ff9800;
+  color: white;
+}
+
+mat-chip.mat-primary {
+  background-color: #4caf50;
+  color: white;
+}
+
+mat-chip.mat-warn {
+  background-color: #f44336;
+  color: white;
+} 
