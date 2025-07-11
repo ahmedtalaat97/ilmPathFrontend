@@ -1,0 +1,67 @@
+<h2 mat-dialog-title>Request Withdrawal</h2>
+
+<mat-dialog-content>
+  <div class="withdrawal-summary">
+    <h3>Payout Summary</h3>
+    
+    <div class="amount-breakdown">
+      <div class="amount-row">
+        <span>Gross Amount:</span>
+        <span class="amount">${{ data.pendingBalance | number:'1.2-2' }}</span>
+      </div>
+      
+      <div class="amount-row commission">
+        <span>Platform Commission (30%):</span>
+        <span class="amount">-${{ calculateCommission() | number:'1.2-2' }}</span>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <div class="amount-row total">
+        <span><strong>Net Amount:</strong></span>
+        <span class="amount"><strong>${{ calculateNetAmount() | number:'1.2-2' }}</strong></span>
+      </div>
+    </div>
+
+    <div class="enrollments-info" *ngIf="data.unpaidEnrollments.length > 0">
+      <p><strong>{{ data.unpaidEnrollments.length }}</strong> unpaid enrollments will be included in this payout.</p>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Payment Method</mat-label>
+      <mat-select [(ngModel)]="withdrawalRequest.paymentMethod" required>
+        <mat-option *ngFor="let method of paymentMethods" [value]="method.value">
+          {{ method.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (Optional)</mat-label>
+      <textarea 
+        matInput 
+        [(ngModel)]="withdrawalRequest.notes"
+        placeholder="Add any additional notes or payment instructions..."
+        rows="3">
+      </textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="warning-notice" *ngIf="data.pendingBalance <= 0">
+    <mat-icon>warning</mat-icon>
+    <span>No pending balance available for withdrawal.</span>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="onSubmit()"
+    [disabled]="data.pendingBalance <= 0">
+    Submit Request
+  </button>
+</mat-dialog-actions> 
