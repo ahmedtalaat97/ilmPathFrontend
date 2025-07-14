@@ -45,21 +45,21 @@
       </button>
       
       <!-- Step 2: Start Onboarding Button (shown when account exists but incomplete) -->
-      <button 
-        mat-raised-button 
-        color="accent" 
-        (click)="startOnboarding()"
-        [disabled]="gettingOnboardingLink"
-        *ngIf="stripeConnectStatus?.accountId && !stripeConnectStatus?.canReceivePayouts">
-        <mat-icon>launch</mat-icon>
-        <span *ngIf="!gettingOnboardingLink">Start Onboarding</span>
-        <span *ngIf="gettingOnboardingLink">Loading...</span>
-      </button>
+
     </mat-card-actions>
   </mat-card>
-
+  <button 
+  mat-raised-button 
+  color="accent" 
+  (click)="startOnboarding()"
+  [disabled]="gettingOnboardingLink"
+  >
+  <mat-icon>launch</mat-icon>
+  <span *ngIf="!gettingOnboardingLink">Start Onboarding</span>
+  <span *ngIf="gettingOnboardingLink">Loading...</span>
+</button>
   <!-- Stripe Dashboard Access (if setup is complete) -->
-  <mat-card class="stripe-dashboard-card" *ngIf="stripeConnectStatus?.isConnected && stripeConnectStatus?.canReceivePayouts">
+  <mat-card class="stripe-dashboard-card" >
     <mat-card-header>
       <mat-card-title>
         <mat-icon>dashboard</mat-icon>
